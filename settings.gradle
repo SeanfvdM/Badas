@@ -1,0 +1,6 @@
+include ':ProfileManager'
+include ':StudentActivity'
+include ':BadasStyle'
+include ':StudentResults'
+include ':app'
+rootProject.name = "BadasSolution"

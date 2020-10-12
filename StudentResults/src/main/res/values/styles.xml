@@ -1,0 +1,8 @@
+<resources>
+    <style name="ResultTheme.Spinner" parent="BadasTheme.Spinner">
+        <item name="android:spinnerStyle">@layout/spinner_text</item>
+        <item name="android:spinnerDropDownItemStyle">@layout/spinner_dropdown</item>
+        <item name="android:background">@drawable/spinner_background</item>
+        <item name="android:popupBackground">@drawable/popup_background</item>
+    </style>
+</resources>

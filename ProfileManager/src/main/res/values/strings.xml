@@ -1,0 +1,8 @@
+<resources>
+    <string name="module_name_pm">Profile Manager</string>
+    <string name="module_developer_pm">Aharon</string>
+
+    <string name="remove">Remove</string>
+    <string name="add_flashcard">Add Flashcard</string>
+    <string name="edit">Edit</string>
+</resources>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="module_name_sr">Student Results</string>
+    <string name="module_developer_sr">Sean</string>
+    <string name="header">[Header]</string>
+    <string name="text1">[Text]</string>
+    <string name="value1">[Value]</string>
+</resources>

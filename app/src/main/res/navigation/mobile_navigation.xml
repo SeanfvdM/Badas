@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.badas.badassolution.ui.placeholder.PlaceholderFragment"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_placeholder" />
+
+    <fragment
+        android:id="@+id/nav_result"
+        android:name="com.badas.studentresults.ResultFragment"
+        android:label="@string/menu_result"
+        tools:layout="@layout/result_layout" />
+
+    <fragment
+        android:id="@+id/nav_student_result"
+        android:name="com.badas.studentresults.StudentResultFragment"
+        android:label="@string/menu_student_result"
+        tools:layout="@layout/student_result_layout" />
+
+    <fragment
+        android:id="@+id/nav_student_activity"
+        android:name="com.badas.studentactivity.StudentActivityFragment"
+        android:label="@string/menu_student_activity"
+        tools:layout="@layout/fragment_student_activity" />
+
+    <fragment
+        android:id="@+id/nav_profile_manager"
+        android:name="com.badas.profilemanager.ManagerFragment"
+        android:label="@string/menu_profile_manager"
+        tools:layout="@layout/fragment_manager" />
+
+</navigation>

@@ -1,0 +1,171 @@
+<resources>
+    <style name="BadasTheme" parent="Theme.MaterialComponents.Light">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorSecondary">@color/colorAccent</item>
+        <item name="colorOnSecondary">@color/colorOnAccent</item>
+
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="backgroundColor">@color/colorBackground</item>
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@color/colorOnSurface</item>
+
+        <item name="fontFamily">@font/lato_regular</item>
+
+        <item name="toolbarStyle">@style/BadasTheme.Toolbar</item>
+        <item name="navigationViewStyle">@style/BadasTheme.NavigationView</item>
+        <item name="appBarLayoutStyle">@style/BadasTheme.AppBarOverlay</item>
+        <item name="floatingActionButtonStyle">@style/BadasTheme.FloatingActionButton</item>
+        <item name="extendedFloatingActionButtonStyle">@style/BadasTheme.ExtendedFloatingActionButton.Icon</item>
+    </style>
+
+    <style name="BadasTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="BadasTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.ActionBar"/>
+
+    <style name="BadasTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
+
+    <style name="BadasTheme.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">
+        <item name="popupTheme">@style/BadasTheme.PopupOverlay</item>
+    </style>
+
+    <style name="BadasTheme.FloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.BadasTheme.SmallComponent</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.BadasTheme.FloatingActionButton</item>
+    </style>
+
+    <style name="BadasTheme.ExtendedFloatingActionButton.Icon" parent="Widget.MaterialComponents.ExtendedFloatingActionButton.Icon">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.BadasTheme.FloatingActionButton</item>
+        <item name="shapeAppearanceOverlay"> @style/ShapeAppearance.BadasTheme.SmallComponent</item>
+    </style>
+
+    <style name="BadasTheme.ExtendedFloatingActionButton" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.BadasTheme.FloatingActionButton</item>
+        <item name="shapeAppearanceOverlay"> @style/ShapeAppearance.BadasTheme.SmallComponent</item>
+    </style>
+
+    <style name="ThemeOverlay.BadasTheme.FloatingActionButton" parent="">
+        <item name="colorSecondary">@color/colorAccent</item>
+        <item name="colorOnSecondary">@color/colorOnAccent</item>
+        <item name="colorOnSurface">@color/colorOnSurface</item>
+    </style>
+
+    <style name="ShapeAppearance.BadasTheme.Menu" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">20%</item>
+        <item name="cornerSizeTopLeft">10%</item>
+        <item name="cornerSizeBottomRight">20%</item>
+        <item name="cornerSizeBottomLeft">10%</item>
+    </style>
+
+    <style name="ShapeAppearance.BadasTheme.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">45%</item>
+    </style>
+
+    <style name="ShapeAppearance.BadasTheme.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">45%</item>
+    </style>
+
+    <style name="ShapeAppearance.BadasTheme.Profile" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="ShapeAppearance.BadasTheme.ProfileType" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="strokeColor">@color/colorPrimary</item>
+    </style>
+
+    <style name="ShapeAppearance.BadasTheme.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="BadasTheme.NavigationView.Popup" parent="Widget.AppCompat.PopupMenu">
+        <item name="itemShapeFillColor">@drawable/drawer_item</item>
+        <item name="itemTextColor">@drawable/drawer_item_text_color</item>
+    </style>
+
+    <style name="BadasTheme.NavigationView" parent="Widget.MaterialComponents.NavigationView">
+        <item name="itemShapeAppearance">@style/ShapeAppearance.BadasTheme.Menu</item>
+        <item name="itemShapeFillColor">@drawable/drawer_item</item>
+        <item name="itemBackground">@drawable/drawer_item_background</item>
+        <item name="itemTextColor">@drawable/drawer_item_text_color</item>
+        <item name="popupMenuStyle">@style/BadasTheme.NavigationView.Popup</item>
+        <item name="android:insetTop">4dp</item>
+        <item name="android:insetBottom">4dp</item>
+        <item name="android:insetLeft">8dp</item>
+        <item name="android:insetRight">8dp</item>
+    </style>
+
+    <style name="BadasTheme.CardTextHeader" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/colorOnSurface</item>
+    </style>
+
+    <style name="BadasTheme.CardText" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/colorOnSurfaceLight</item>
+    </style>
+
+    <style name="BadasTheme.CardView" parent="Widget.MaterialComponents.CardView">
+        <item name="strokeColor">@color/colorStroke</item>
+        <item name="cardBackgroundColor">@color/colorSurface</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="cardCornerRadius">8dp</item>
+    </style>
+
+    <style name="BadasTheme.Spinner" parent="Platform.Widget.AppCompat.Spinner">
+        <item name="android:spinnerMode">dropdown</item>
+    </style>
+
+    <style name="BadasTheme.Spinner.TextView" parent="android:Widget.TextView.SpinnerItem">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/colorOnSurface</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="singleLine">true</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:dropDownSelector">?attr/listChoiceBackgroundIndicator</item>
+    </style>
+
+    <style name="BadasTheme.Spinner.DropDown" parent="BadasTheme">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/colorOnSurface</item>
+        <item name="android:paddingVertical">2dp</item>
+        <item name="android:paddingHorizontal">2dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="singleLine">true</item>
+        <item name="android:ellipsize">marquee</item>
+    </style>
+
+    <style name="BadasTheme.Button" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="font">@font/lato_bold</item>
+    </style>
+
+    <style name="BadasTheme.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="font">@font/lato_bold</item>
+    </style>
+
+    <style name="BadasTheme.Button.ErrorTextButton" parent="BadasTheme.Button.TextButton">
+        <item name="android:textColor">@color/colorError</item>
+        <item name="rippleColor">@color/colorError</item>
+    </style>
+</resources>
