@@ -1,3 +1,4 @@
+include ':Storyboard'
 include ':FirebaseManager'
 include ':ProfileManager'
 include ':StudentActivity'
