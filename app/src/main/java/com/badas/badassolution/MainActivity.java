@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle(getString(R.string.module_name_gm) + " - " + getString(R.string.module_developer_gm))
                 .add(new DynamicMenu.MenuItem(R.id.nav_game_manager)
                         .setTitle(getString(R.string.menu_game_manager))
-                        .setIcon(ContextCompat.getDrawable(this, R.drawable.ic_work))));
+                        .setIcon(ContextCompat.getDrawable(this, R.drawable.ic_baseline_gamepad_24))));
 
         DynamicMenu.getInstance().attach(navigationView);
 
