@@ -1,5 +1,7 @@
 <resources>
     <style name="BadasTheme" parent="Theme.MaterialComponents.Light">
+        <item name="isLightTheme">true</item>
+        <item name="isMaterialTheme">true</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -7,8 +9,9 @@
         <item name="colorOnSecondary">@color/colorOnAccent</item>
 
         <item name="android:statusBarColor">?attr/colorSurface</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightStatusBar">@bool/isLight</item>
         <item name="backgroundColor">@color/colorBackground</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
         <item name="colorSurface">@color/colorSurface</item>
         <item name="colorOnSurface">@color/colorOnSurface</item>
 
