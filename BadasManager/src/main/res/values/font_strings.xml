@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sample_text">ABCDEFGHIJKLMNOPQRSTUVWXUZ\nabcdefghijklmnopqrstuvwxyz\n0123456789\n\nThe quick brown fox jumps over the lazy dog.</string>
+    <string name="loading_fonts">Please wait while we retrieve the fonts.</string>
+    <string name="loading_font">We are retrieving your selected font.</string>
+    <string name="flf">Failed loading font</string>
+    <string name="fnf">Font not found</string>
+    <string name="fu">Font unavailable</string>
+    <string name="fqm">Font query is malformed</string>
+    <string name="fpnf">Font provider not found</string>
+    <string name="sv">Security violation</string>
+    <string name="wc">Wrong certificate</string>
+    <string name="fl">Font is loading</string>
+    <string name="load">Load</string>
+    <string name="search_fonts">Search Fonts</string>
+    <string name="sfv">Select a font variant</string>
+    <string name="dfs">Device font scale:</string>
+    <string name="rfs">\nRelative Font size:</string>
+    <string name="googleFonts">To view more fonts <a href="https://fonts.google.com/"><b>Google</b> Fonts</a>\n<b>Disclaimer</b> not all fonts are available for download.</string>
+    <string name="pevff">Please enter a valid font family</string>
+    <string name="selected_font">Select </string>
+    <string name="select_font_null">Select Font</string>
+</resources>
