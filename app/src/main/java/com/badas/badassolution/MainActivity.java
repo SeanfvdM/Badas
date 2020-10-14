@@ -1,7 +1,9 @@
 package com.badas.badassolution;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Menu;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +17,9 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.badas.badasstyle.FontDownloader.Font;
+import com.badas.badasstyle.FontDownloader.FontDialogFragment;
+import com.badas.badasstyle.FontDownloader.FontDownloader;
 import com.badas.profilemanager.ManagerFragment;
 import com.badas.profilemanager.Profile;
 import com.badas.studentactivity.Student;
@@ -27,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -135,6 +141,43 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        if (false) {
+            String apiKey = "AIzaSyBz-ZqLY0jXSlGwq1E3lN9JK_S_hI1ThMg";
+            new FontDownloader()
+                    .setJsonLabels(FontDownloader.FontJsonLabels.GOOGLE_FONT_JSON_LABELS)
+                    .requestListDownload(FontDownloader.ApiLinks.GOOGLE_FONTS_API_NO_KEY,
+                            apiKey,
+                            new FontDownloader.FontListDownloaderCallback() {
+                                @Override
+                                public void onFontsReceived(String result) {
+
+                                }
+
+                                @Override
+                                public void onFontsReceived(List<Font> fonts) {
+
+                                }
+
+                                @Override
+                                public void onFailed(Exception e) {
+
+                                }
+                            });
+
+            final FontDialogFragment fontDialogFragment = new FontDialogFragment(apiKey);
+            fontDialogFragment.showRelativeFontSize();
+            fontDialogFragment.setFontListener(new FontDialogFragment.FontListener() {
+                @Override
+                public void onFontSelectedListener(com.koolio.library.Font lastSelectedFont, Typeface lastSelectedTypeface) {
+                    Toast.makeText(MainActivity.this, lastSelectedFont.getFontFamily(), Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            fontDialogFragment
+                    .show(getSupportFragmentManager(), "Fonts");
+        }
+
     }
 
     @Override
