@@ -12,4 +12,5 @@
     <string name="menu_student_result">Student Result</string>
     <string name="menu_student_activity">Student Activity</string>
     <string name="menu_profile_manager">Profile Manager</string>
+    <string name="menu_game_manager">Game Manager</string>
 </resources>

@@ -70,6 +70,12 @@ public class MainActivity extends AppCompatActivity {
                         .setTitle(getString(R.string.menu_student_activity))
                         .setIcon(ContextCompat.getDrawable(this, R.drawable.ic_work))));
 
+        DynamicMenu.getInstance().add(new DynamicMenu.SubMenu(3)
+                .setTitle(getString(R.string.module_name_gm) + " - " + getString(R.string.module_developer_gm))
+                .add(new DynamicMenu.MenuItem(R.id.nav_game_manager)
+                        .setTitle(getString(R.string.menu_game_manager))
+                        .setIcon(ContextCompat.getDrawable(this, R.drawable.ic_work))));
+
         DynamicMenu.getInstance().attach(navigationView);
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -84,53 +90,48 @@ public class MainActivity extends AppCompatActivity {
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
             public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
-                switch (destination.getId()) {
-                    case R.id.nav_result:
-                    case R.id.nav_student_result:
-                        if (ResultFragment.getCurrentResultsData().size() < 1) {
-                            ArrayList<StudentResult> resultsData = new ArrayList<>();
-                            Calendar calendar = Calendar.getInstance();
-                            ArrayList<StudentResult.ResultData> data;
-                            for (int i = 0; i < 10; i++) {
-                                for (int j = 0; j < 50; j++) {
-                                    data = new ArrayList<>();
-                                    calendar.add(Calendar.DAY_OF_YEAR, j);
-                                    data.add(new StudentResult.ResultData("Date:", new SimpleDateFormat("dd MMM YYYY", Locale.getDefault()).format(calendar.getTime())));
-                                    for (int k = 1; k < i + 1; k++)
-                                        data.add(new StudentResult.ResultData("Text " + k + ":", "Value " + k));
-                                    resultsData.add(
-                                            new StudentResult()
-                                                    .setStudent("Student " + i)
-                                                    .setHeader("Item: " + j)
-                                                    .setResultsData(data)
-                                    );
-                                }
+                if (destination.getId() == R.id.nav_result || destination.getId() == R.id.nav_student_result) {
+                    if (ResultFragment.getCurrentResultsData().size() < 1) {
+                        ArrayList<StudentResult> resultsData = new ArrayList<>();
+                        Calendar calendar = Calendar.getInstance();
+                        ArrayList<StudentResult.ResultData> data;
+                        for (int i = 0; i < 10; i++) {
+                            for (int j = 0; j < 50; j++) {
+                                data = new ArrayList<>();
+                                calendar.add(Calendar.DAY_OF_YEAR, j);
+                                data.add(new StudentResult.ResultData("Date:", new SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(calendar.getTime())));
+                                for (int k = 1; k < i + 1; k++)
+                                    data.add(new StudentResult.ResultData("Text " + k + ":", "Value " + k));
+                                resultsData.add(
+                                        new StudentResult()
+                                                .setStudent("Student " + i)
+                                                .setHeader("Item: " + j)
+                                                .setResultsData(data)
+                                );
                             }
-
-                            ResultFragment.initDataSet(resultsData);
                         }
-                        break;
-                    case R.id.nav_student_activity:
-                        ArrayList<Student> students = new ArrayList<>();
-                        students.add(new Student("Sean", new Date(), (long) 500000, "test", "test"));
-                        students.add(new Student("Aharon", new Date(), (long) 1500000, "test2", "test"));
-                        students.add(new Student("Daniel", new Date(), (long) 10000, "test", "test3"));
-                        students.add(new Student("Brandon", new Date(), (long) 506300, "test4", "test4"));
-                        students.add(new Student("Avremi", new Date(), (long) 1000, "test5", "test5"));
 
-                        StudentActivityFragment.initDataSet(students);
-                        break;
-                    case R.id.nav_profile_manager:
-                        ArrayList<Profile> userList = new ArrayList<>();
+                        ResultFragment.initDataSet(resultsData);
+                    }
+                } else if (destination.getId() == R.id.nav_student_activity) {
+                    ArrayList<Student> students = new ArrayList<>();
+                    students.add(new Student("Sean", new Date(), (long) 500000, "test", "test"));
+                    students.add(new Student("Aharon", new Date(), (long) 1500000, "test2", "test"));
+                    students.add(new Student("Daniel", new Date(), (long) 10000, "test", "test3"));
+                    students.add(new Student("Brandon", new Date(), (long) 506300, "test4", "test4"));
+                    students.add(new Student("Avremi", new Date(), (long) 1000, "test5", "test5"));
 
-                        userList.add(new Profile(com.badas.profilemanager.R.drawable.profile_icon_templete, "Aharon", "Email:\talexkangy@gmail.com \nPhone Number:\t0749597678"));
-                        userList.add(new Profile(com.badas.profilemanager.R.drawable.profile_icon_templete, "Sean", "Email:\tSean@gmail.com \nPhone Number:\t0825412578"));
-                        userList.add(new Profile(com.badas.profilemanager.R.drawable.profile_icon_templete, "Daniel", "Email:\tDaniel@gmail.com \nPhone Number:\t0720215128"));
-                        userList.add(new Profile(com.badas.profilemanager.R.drawable.profile_icon_templete, "Brandon", "Email:\tBrandon@gmail.com \nPhone Number:\t0832514325"));
-                        userList.add(new Profile(com.badas.profilemanager.R.drawable.profile_icon_templete, "Avremi", "Email:\tAvremi@gmail.com \nPhone Number:\t0821986254"));
+                    StudentActivityFragment.initDataSet(students);
+                } else if (destination.getId() == R.id.nav_profile_manager) {
+                    ArrayList<Profile> userList = new ArrayList<>();
 
-                        ManagerFragment.initDataSet(userList);
-                        break;
+                    userList.add(new Profile(com.badas.profilemanager.R.drawable.profile_icon_templete, "Aharon", "Email:\talexkangy@gmail.com \nPhone Number:\t0749597678"));
+                    userList.add(new Profile(com.badas.profilemanager.R.drawable.profile_icon_templete, "Sean", "Email:\tSean@gmail.com \nPhone Number:\t0825412578"));
+                    userList.add(new Profile(com.badas.profilemanager.R.drawable.profile_icon_templete, "Daniel", "Email:\tDaniel@gmail.com \nPhone Number:\t0720215128"));
+                    userList.add(new Profile(com.badas.profilemanager.R.drawable.profile_icon_templete, "Brandon", "Email:\tBrandon@gmail.com \nPhone Number:\t0832514325"));
+                    userList.add(new Profile(com.badas.profilemanager.R.drawable.profile_icon_templete, "Avremi", "Email:\tAvremi@gmail.com \nPhone Number:\t0821986254"));
+
+                    ManagerFragment.initDataSet(userList);
                 }
             }
         });
