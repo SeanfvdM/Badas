@@ -2,11 +2,18 @@ package com.badas.badasstyle.FontDownloader;
 
 import android.os.AsyncTask;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Project: FontTest
@@ -97,8 +104,53 @@ public class FontDownloader {
         }
 
         private List<Font> parseJson(String raw) {
-            //todo continue here
-            return new ArrayList<>();
+            ArrayList<Font> fontArrayList = new ArrayList<>();
+            if (raw != null) {
+                JSONObject jsonObj = null;
+                try {
+                    jsonObj = new JSONObject(raw);
+                    JSONArray fonts = jsonObj.getJSONArray("items");
+
+                    for (int i = 0; i < fonts.length(); ++i) {
+                        JSONObject c = fonts.getJSONObject(i);
+                        String family = c.getString("family");
+                        String category = c.getString("category");
+                        JSONArray variants = c.getJSONArray("variants");
+                        String[] variantStrArray = new String[variants.length()];
+
+                        for (int j = 0; j < variants.length(); ++j) {
+                            variantStrArray[j] = variants.getString(j);
+                        }
+
+                        JSONArray subsets = c.getJSONArray("subsets");
+                        String[] subsetStrArray = new String[subsets.length()];
+
+                        for (int j = 0; j < subsets.length(); ++j) {
+                            subsetStrArray[j] = subsets.getString(j);
+                        }
+
+                        String version = c.getString("version");
+                        String lastModified = c.getString("lastModified");
+                        fontArrayList.add(new Font()
+                                .setFamily(family)
+                                .setCategory(category)
+                                .setVariants(variantStrArray)
+                                .setSubset(subsetStrArray)
+                                .setVersion(version)
+                                .setLastModified(
+                                        new SimpleDateFormat(
+                                                "yyyy-MM-dd",
+                                                Locale.getDefault()
+                                        ).parse(lastModified)
+                                ));
+                    }
+
+                } catch (JSONException | ParseException e) {
+                    e.printStackTrace();
+                }
+
+            }
+            return fontArrayList;
         }
     }
 }

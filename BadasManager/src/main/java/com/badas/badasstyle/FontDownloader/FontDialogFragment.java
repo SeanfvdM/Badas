@@ -25,6 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.provider.FontsContractCompat;
 
+import com.badas.badasstyle.FontDownloader.FontQuery.GoogleFontsQuery;
 import com.badas.badasstyle.R;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
@@ -32,9 +33,6 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.slider.LabelFormatter;
 import com.google.android.material.slider.Slider;
-import com.koolio.library.DownloadableFontList;
-import com.koolio.library.Font;
-import com.koolio.library.FontList;
 
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
@@ -49,7 +47,7 @@ public class FontDialogFragment extends BottomSheetDialogFragment {
     private AutoCompleteTextView fontSearch;
     private MaterialButton loadFont;
     private TextView sampleText;
-    private FontList fontList = new FontList();
+    private List<Font> fontList = new ArrayList<>();
     private Font selected;
     private HandlerThread handlerThread;
     private Handler handler;
@@ -121,9 +119,11 @@ public class FontDialogFragment extends BottomSheetDialogFragment {
             public void onCheckedChanged(ChipGroup group, int checkedId) {
                 try {
                     Chip chip = view.findViewById(checkedId);
-                    for (int i = 0; i < selected.getFontVariants().length; i++) {
-                        if (selected.getFontVariants()[i].equalsIgnoreCase(chip.getTag().toString())) {
-                            loadFont(selected.getQueryString(i));
+                    for (int i = 0; i < selected.getVariants().length; i++) {
+                        if (selected.getVariants()[i].equalsIgnoreCase(chip.getTag().toString())) {
+                            loadFont(new GoogleFontsQuery(selected.getFamily())
+                                    .extractVariant(selected.getVariants()[i])
+                                    .Build());
                             return;
                         }
                     }
@@ -145,12 +145,12 @@ public class FontDialogFragment extends BottomSheetDialogFragment {
                 if (imm != null) {
                     imm.hideSoftInputFromWindow(fontSearch.getWindowToken(), 0);
                 }
-                for (int i = 0; i < fontList.getFontArrayList().size(); i++) {
-                    if (fontSearch.getText().toString().equalsIgnoreCase(fontList.getFontArrayList().get(i).getFontFamily())) {
-                        selected = fontList.getFontArrayList().get(i);
-                        loadVariantChips(selected.getFontVariants());
+                for (int i = 0; i < fontList.size(); i++) {
+                    if (fontSearch.getText().toString().equalsIgnoreCase(fontList.get(i).getFamily())) {
+                        selected = fontList.get(i);
+                        loadVariantChips(selected.getVariants());
                         view.findViewById(R.id.btn_select).requestFocus();
-                        ((MaterialButton) view.findViewById(R.id.btn_select)).setText(MessageFormat.format("{0} {1}", getString(R.string.selected_font), selected.getFontFamily()));
+                        ((MaterialButton) view.findViewById(R.id.btn_select)).setText(MessageFormat.format("{0} {1}", getString(R.string.selected_font), selected.getFamily()));
                         break;
                     }
                 }
@@ -165,27 +165,36 @@ public class FontDialogFragment extends BottomSheetDialogFragment {
             }
         });
 
-        DownloadableFontList.FontListCallback fontListCallback = new DownloadableFontList.FontListCallback() {
-            @Override
-            public void onFontListRetrieved(FontList list) {
-                fontList = list;
-                fontSearch.setEnabled(true);
-                loadFont.setEnabled(true);
-                view.findViewById(R.id.til_fontSearch).setEnabled(true);
-                fontSearch.requestFocus();
-                //https://stackoverflow.com/a/7291048
-                InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (imm != null) {
-                    imm.showSoftInput(fontSearch, InputMethodManager.SHOW_IMPLICIT);
-                }
-                fontSearch.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, fontList.getFontFamilyList()));
-            }
+        new FontDownloader()
+                .setJsonLabels(FontDownloader.FontJsonLabels.GOOGLE_FONT_JSON_LABELS)
+                .requestListDownload(FontDownloader.ApiLinks.GOOGLE_FONTS_API_NO_KEY,
+                        apiKey,
+                        new FontDownloader.FontListDownloaderCallback() {
+                            @Override
+                            public void onFontsReceived(String result) {
 
-            @Override
-            public void onTypefaceRequestFailed(int i) {
-                view.findViewById(R.id.btn_select).setEnabled(false);
-            }
-        };
+                            }
+
+                            @Override
+                            public void onFontsReceived(List<Font> fonts) {
+                                fontList = fonts;
+                                fontSearch.setEnabled(true);
+                                loadFont.setEnabled(true);
+                                view.findViewById(R.id.til_fontSearch).setEnabled(true);
+                                fontSearch.requestFocus();
+                                //https://stackoverflow.com/a/7291048
+                                InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                if (imm != null) {
+                                    imm.showSoftInput(fontSearch, InputMethodManager.SHOW_IMPLICIT);
+                                }
+                                fontSearch.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, Font.getFontFamilies(fontList)));
+                            }
+
+                            @Override
+                            public void onFailed(Exception e) {
+                                view.findViewById(R.id.btn_select).setEnabled(false);
+                            }
+                        });
 
         view.findViewById(R.id.btn_select).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -198,8 +207,6 @@ public class FontDialogFragment extends BottomSheetDialogFragment {
                 dismissAllowingStateLoss();
             }
         });
-
-        DownloadableFontList.requestDownloadableFontList(fontListCallback, apiKey);
     }
 
     public void loadVariantChips(String[] variants) {

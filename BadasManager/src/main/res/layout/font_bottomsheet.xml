@@ -41,7 +41,7 @@
                 android:id="@+id/btn_load"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:enabled="false"
                 android:text="@string/load"
                 app:layout_constraintBottom_toBottomOf="@+id/til_fontSearch"

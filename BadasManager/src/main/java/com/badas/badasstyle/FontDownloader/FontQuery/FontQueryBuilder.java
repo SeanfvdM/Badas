@@ -64,6 +64,44 @@ public abstract class FontQueryBuilder {
         return this;
     }
 
+    public FontQueryBuilder extractVariant(String variant) {
+        this.italic = variant.contains("italic");
+        switch (Integer.parseInt(
+                variant.replace("italic", "")
+                        .replace("regular", "400")
+                        .replace(" ", "")
+        )) {
+            case Weight.WEIGHT_100:
+                weight = Weight.WEIGHT_100;
+                break;
+            case Weight.WEIGHT_200:
+                weight = Weight.WEIGHT_200;
+                break;
+            case Weight.WEIGHT_300:
+                weight = Weight.WEIGHT_300;
+                break;
+            case Weight.WEIGHT_400:
+                weight = Weight.WEIGHT_400;
+                break;
+            case Weight.WEIGHT_500:
+                weight = Weight.WEIGHT_500;
+                break;
+            case Weight.WEIGHT_600:
+                weight = Weight.WEIGHT_600;
+                break;
+            case Weight.WEIGHT_700:
+                weight = Weight.WEIGHT_700;
+                break;
+            case Weight.WEIGHT_800:
+                weight = Weight.WEIGHT_800;
+                break;
+            case Weight.WEIGHT_900:
+                weight = Weight.WEIGHT_900;
+                break;
+        }
+        return this;
+    }
+
     public abstract String Build();
 
     public @interface Weight {

@@ -13,12 +13,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.badas.badassolution.BuildConfig;
 import com.badas.badassolution.R;
 import com.badas.badasstyle.FontDownloader.Font;
 import com.badas.badasstyle.FontDownloader.FontDialogFragment;
-import com.badas.badasstyle.FontDownloader.FontDownloader;
-
-import java.util.List;
 
 public class PlaceholderFragment extends Fragment {
 
@@ -29,35 +27,14 @@ public class PlaceholderFragment extends Fragment {
         final TextView textView = root.findViewById(R.id.text_placeholder);
         textView.setText("This is a placeholder screen");
 
-        String apiKey = getString(R.string.fontKey);
-        new FontDownloader()
-                .setJsonLabels(FontDownloader.FontJsonLabels.GOOGLE_FONT_JSON_LABELS)
-                .requestListDownload(FontDownloader.ApiLinks.GOOGLE_FONTS_API_NO_KEY,
-                        apiKey,
-                        new FontDownloader.FontListDownloaderCallback() {
-                            @Override
-                            public void onFontsReceived(String result) {
-
-                            }
-
-                            @Override
-                            public void onFontsReceived(List<Font> fonts) {
-
-                            }
-
-                            @Override
-                            public void onFailed(Exception e) {
-
-                            }
-                        });
-
-        final FontDialogFragment fontDialogFragment = new FontDialogFragment(apiKey);
+        final FontDialogFragment fontDialogFragment = new FontDialogFragment(BuildConfig.GoogleFont_Key);
         fontDialogFragment.showRelativeFontSize();
         fontDialogFragment.setFontListener(new FontDialogFragment.FontListener() {
             @Override
-            public void onFontSelectedListener(com.koolio.library.Font lastSelectedFont, Typeface lastSelectedTypeface) {
-                Toast.makeText(requireContext(), lastSelectedFont.getFontFamily(), Toast.LENGTH_SHORT).show();
+            public void onFontSelectedListener(Font lastSelectedFont, Typeface lastSelectedTypeface) {
+                Toast.makeText(requireContext(), lastSelectedFont.getFamily(), Toast.LENGTH_SHORT).show();
             }
+
         });
 
         Button button = root.findViewById(R.id.font_button);
