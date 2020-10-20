@@ -6,5 +6,6 @@ include ':ProfileManager'
 include ':StudentActivity'
 include ':BadasManager'
 include ':StudentResults'
+include ':Login'
 include ':app'
 rootProject.name = "BadasSolution"
