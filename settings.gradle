@@ -1,9 +1,10 @@
 include ':GameManager'
 include ':Storyboard'
+include ':Login'
 include ':FirebaseManager'
 include ':ProfileManager'
 include ':StudentActivity'
-include ':BadasManager'
+include ':BadasStyle'
 include ':StudentResults'
 include ':app'
 rootProject.name = "BadasSolution"

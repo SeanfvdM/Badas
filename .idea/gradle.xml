@@ -11,9 +11,10 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/BadasManager" />
+            <option value="$PROJECT_DIR$/BadasStyle" />
             <option value="$PROJECT_DIR$/FirebaseManager" />
             <option value="$PROJECT_DIR$/GameManager" />
+            <option value="$PROJECT_DIR$/Login" />
             <option value="$PROJECT_DIR$/ProfileManager" />
             <option value="$PROJECT_DIR$/Storyboard" />
             <option value="$PROJECT_DIR$/StudentActivity" />
