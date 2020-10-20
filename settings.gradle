@@ -4,7 +4,7 @@ include ':Login'
 include ':FirebaseManager'
 include ':ProfileManager'
 include ':StudentActivity'
-include ':BadasStyle'
+include ':BadasManager'
 include ':StudentResults'
 include ':app'
 rootProject.name = "BadasSolution"
