@@ -1,0 +1,1476 @@
+Index: BadasManager/src/main/java/com/badas/badasstyle/FontDownloader/FontDialogFragment.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.badas.badasstyle.FontDownloader;\r\n\r\nimport android.annotation.SuppressLint;\r\nimport android.annotation.TargetApi;\r\nimport android.content.Context;\r\nimport android.content.res.Resources;\r\nimport android.graphics.Typeface;\r\nimport android.os.Build;\r\nimport android.os.Bundle;\r\nimport android.os.CancellationSignal;\r\nimport android.os.Handler;\r\nimport android.os.HandlerThread;\r\nimport android.provider.FontRequest;\r\nimport android.provider.FontsContract;\r\nimport android.text.method.LinkMovementMethod;\r\nimport android.view.LayoutInflater;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\nimport android.view.inputmethod.InputMethodManager;\r\nimport android.widget.ArrayAdapter;\r\nimport android.widget.AutoCompleteTextView;\r\nimport android.widget.TextView;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.annotation.Nullable;\r\nimport androidx.core.provider.FontsContractCompat;\r\n\r\nimport com.badas.badasstyle.FontDownloader.FontQuery.GoogleFontsQuery;\r\nimport com.badas.badasstyle.R;\r\nimport com.google.android.material.bottomsheet.BottomSheetDialogFragment;\r\nimport com.google.android.material.button.MaterialButton;\r\nimport com.google.android.material.chip.Chip;\r\nimport com.google.android.material.chip.ChipGroup;\r\nimport com.google.android.material.slider.LabelFormatter;\r\nimport com.google.android.material.slider.Slider;\r\n\r\nimport java.text.DecimalFormat;\r\nimport java.text.MessageFormat;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\n@TargetApi(26)\r\npublic class FontDialogFragment extends BottomSheetDialogFragment {\r\n    private final String apiKey;\r\n    private View view;\r\n    private ChipGroup chipGroup;\r\n    private AutoCompleteTextView fontSearch;\r\n    private MaterialButton loadFont;\r\n    private TextView sampleText;\r\n    private List<Font> fontList = new ArrayList<>();\r\n    private Font selected;\r\n    private HandlerThread handlerThread;\r\n    private Handler handler;\r\n    private boolean showRelativeFS = false;\r\n    private Typeface selectedTypeface;\r\n    private Font selectedFont;\r\n    private FontListener fontListener;\r\n\r\n    public FontDialogFragment(String apiKey) {\r\n        this.apiKey = apiKey;\r\n    }\r\n\r\n    public void setFontListener(FontListener fontListener) {\r\n        this.fontListener = fontListener;\r\n    }\r\n\r\n    @Nullable\r\n    @Override\r\n    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,\r\n                             @Nullable Bundle savedInstanceState) {\r\n        view = inflater.inflate(R.layout.font_bottomsheet, container, false);\r\n        init();\r\n        return view;\r\n    }\r\n\r\n    private void init() {\r\n        ((TextView) view.findViewById(R.id.attribute)).setMovementMethod(LinkMovementMethod.getInstance());\r\n\r\n        handlerThread = new HandlerThread(\"fontThread\");\r\n        handlerThread.start();\r\n        handler = new Handler(handlerThread.getLooper());\r\n\r\n        Slider slider = view.findViewById(R.id.fontSize);\r\n        if (showRelativeFS) {\r\n            view.findViewById(R.id.tv_deviceFontData).setVisibility(View.VISIBLE);\r\n            ((TextView) view.findViewById(R.id.tv_deviceFontData))\r\n                    .setText(MessageFormat.format(\"{0}{1}{2}{3}\", getString(R.string.dfs), new DecimalFormat(\"0.##\").format(getResources().getConfiguration().fontScale), getString(R.string.rfs), new DecimalFormat(\"0.00 px\").format(getResources().getConfiguration().fontScale * slider.getValue())));\r\n        }\r\n        ((TextView) view.findViewById(R.id.fontSizeText)).setText(new DecimalFormat(\"0.## sp\").format(slider.getValue()));\r\n        slider.addOnChangeListener(new Slider.OnChangeListener() {\r\n            @Override\r\n            public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {\r\n                if (value < 12) {\r\n                    ((TextView) view.findViewById(R.id.fontSizeText)).setTextColor(getResources().getColor(R.color.design_default_color_error, null));\r\n                } else {\r\n                    ((TextView) view.findViewById(R.id.fontSizeText)).setTextColor(((TextView) view.findViewById(R.id.tv_deviceFontData)).getTextColors());\r\n                }\r\n                ((TextView) view.findViewById(R.id.fontSizeText)).setText(new DecimalFormat(\"0.## sp\").format(value));\r\n                ((TextView) view.findViewById(R.id.tv_deviceFontData)).setText(MessageFormat.format(\"{0}{1}{2}{3}\", getString(R.string.dfs), new DecimalFormat(\"0.##\").format(getResources().getConfiguration().fontScale), getString(R.string.rfs), new DecimalFormat(\"0.00 px\").format(getResources().getConfiguration().fontScale * value)));\r\n                sampleText.setTextSize(value);\r\n            }\r\n        });\r\n        slider.setLabelFormatter(new LabelFormatter() {\r\n            @NonNull\r\n            @Override\r\n            public String getFormattedValue(float value) {\r\n                return new DecimalFormat(\"0.## sp\").format(value);\r\n            }\r\n        });\r\n        chipGroup = view.findViewById(R.id.chipGroup);\r\n        fontSearch = view.findViewById(R.id.actv_fontSearch);\r\n        chipGroup.setVisibility(View.GONE);\r\n        loadFont = view.findViewById(R.id.btn_load);\r\n        sampleText = view.findViewById(R.id.sampleText);\r\n        sampleText.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels / 4);\r\n\r\n        chipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {\r\n            @Override\r\n            public void onCheckedChanged(ChipGroup group, int checkedId) {\r\n                try {\r\n                    Chip chip = view.findViewById(checkedId);\r\n                    for (int i = 0; i < selected.getVariants().length; i++) {\r\n                        if (selected.getVariants()[i].equalsIgnoreCase(chip.getTag().toString())) {\r\n                            loadFont(new GoogleFontsQuery(selected.getFamily())\r\n                                    .extractVariant(selected.getVariants()[i])\r\n                                    .Build());\r\n                            return;\r\n                        }\r\n                    }\r\n                } catch (Exception ignored) {\r\n                    sampleText.setText(R.string.sfv);\r\n                }\r\n\r\n            }\r\n        });\r\n\r\n        loadFont.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n                sampleText.setText(R.string.loading_font);\r\n                sampleText.setTypeface(null);\r\n                fontSearch.clearFocus();\r\n                selected = null;\r\n                InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);\r\n                if (imm != null) {\r\n                    imm.hideSoftInputFromWindow(fontSearch.getWindowToken(), 0);\r\n                }\r\n                for (int i = 0; i < fontList.size(); i++) {\r\n                    if (fontSearch.getText().toString().equalsIgnoreCase(fontList.get(i).getFamily())) {\r\n                        selected = fontList.get(i);\r\n                        loadVariantChips(selected.getVariants());\r\n                        view.findViewById(R.id.btn_select).requestFocus();\r\n                        ((MaterialButton) view.findViewById(R.id.btn_select)).setText(MessageFormat.format(\"{0} {1}\", getString(R.string.selected_font), selected.getFamily()));\r\n                        break;\r\n                    }\r\n                }\r\n                view.findViewById(R.id.btn_select).setEnabled(true);\r\n                if (selected == null) {\r\n                    sampleText.setText(R.string.pevff);\r\n                    selectedTypeface = null;\r\n                    view.findViewById(R.id.btn_select).setEnabled(false);\r\n                    ((MaterialButton) view.findViewById(R.id.btn_select)).setText(R.string.select_font_null);\r\n                }\r\n                selectedFont = selected;\r\n            }\r\n        });\r\n\r\n        new FontDownloader()\r\n                .setJsonLabels(FontDownloader.FontJsonLabels.GOOGLE_FONT_JSON_LABELS)\r\n                .requestListDownload(FontDownloader.ApiLinks.GOOGLE_FONTS_API_NO_KEY,\r\n                        apiKey,\r\n                        new FontDownloader.FontListDownloaderCallback() {\r\n                            @Override\r\n                            public void onFontsReceived(String result) {\r\n\r\n                            }\r\n\r\n                            @Override\r\n                            public void onFontsReceived(List<Font> fonts) {\r\n                                fontList = fonts;\r\n                                fontSearch.setEnabled(true);\r\n                                loadFont.setEnabled(true);\r\n                                view.findViewById(R.id.til_fontSearch).setEnabled(true);\r\n                                fontSearch.requestFocus();\r\n                                //https://stackoverflow.com/a/7291048\r\n                                InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);\r\n                                if (imm != null) {\r\n                                    imm.showSoftInput(fontSearch, InputMethodManager.SHOW_IMPLICIT);\r\n                                }\r\n                                fontSearch.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, Font.getFontFamilies(fontList)));\r\n                            }\r\n\r\n                            @Override\r\n                            public void onFailed(Exception e) {\r\n                                view.findViewById(R.id.btn_select).setEnabled(false);\r\n                            }\r\n                        });\r\n\r\n        view.findViewById(R.id.btn_select).setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n                try {\r\n                    fontListener.onFontSelectedListener(selectedFont, selectedTypeface);\r\n                } catch (Exception ignored) {\r\n\r\n                }\r\n                dismissAllowingStateLoss();\r\n            }\r\n        });\r\n    }\r\n\r\n    public void loadVariantChips(String[] variants) {\r\n        chipGroup.removeAllViews();\r\n        try {\r\n            chipGroup.clearCheck();\r\n        } catch (Exception ignored) {\r\n\r\n        }\r\n        Chip child;\r\n        for (String variant : variants) {\r\n            child = (Chip) LayoutInflater.from(view.getContext())\r\n                    .inflate(R.layout.font_chip, chipGroup, false);\r\n            child.setId(variant.hashCode());\r\n            child.setText(variant);\r\n            child.setTag(variant);\r\n            if (variant.contains(\"italic\")) {\r\n                child.setTypeface(null, Typeface.ITALIC);\r\n                if (!variant.equals(\"italic\"))\r\n                    child.setText(variant.replace(\"italic\", \" italic\"));\r\n            }\r\n\r\n            chipGroup.addView(child);\r\n            if (variant.contains(\"regular\"))\r\n                chipGroup.check(variant.hashCode());\r\n        }\r\n        if (chipGroup.getCheckedChipId() == -1)\r\n            chipGroup.check(variants[0].hashCode());\r\n        chipGroup.setVisibility(View.VISIBLE);\r\n    }\r\n\r\n    public FontDialogFragment showRelativeFontSize() {\r\n        showRelativeFS = true;\r\n        try {\r\n            view.findViewById(R.id.tv_deviceFontData).setVisibility(View.VISIBLE);\r\n        } catch (Exception ignored) {\r\n\r\n        }\r\n        return this;\r\n    }\r\n\r\n    private void loadFont(String query) {\r\n        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {\r\n            requestFont(query);\r\n        } else {\r\n            requestFontLegacy(query);\r\n        }\r\n    }\r\n\r\n    private List<List<byte[]>> getCertificate() {\r\n        byte[] dev = getResources().getStringArray(R.array.com_google_android_gms_fonts_certs_dev)[0].getBytes();\r\n        byte[] prod = getResources().getStringArray(R.array.com_google_android_gms_fonts_certs_prod)[0].getBytes();\r\n        List<byte[]> com_google_android_gms_fonts_certs_dev = new ArrayList<>();\r\n        com_google_android_gms_fonts_certs_dev.add(dev);\r\n        List<byte[]> com_google_android_gms_fonts_certs_prod = new ArrayList<>();\r\n        com_google_android_gms_fonts_certs_prod.add(prod);\r\n        List<List<byte[]>> com_google_android_gms_fonts_certs = new ArrayList<>();\r\n        com_google_android_gms_fonts_certs.add(com_google_android_gms_fonts_certs_dev);\r\n        com_google_android_gms_fonts_certs.add(com_google_android_gms_fonts_certs_prod);\r\n        return com_google_android_gms_fonts_certs;\r\n    }\r\n\r\n    private void requestFont(String query) {\r\n        FontRequest request;\r\n        try {\r\n            request = new FontRequest(\r\n                    \"com.google.android.gms.fonts\",\r\n                    \"com.google.android.gms\",\r\n                    query,\r\n                    getCertificate()\r\n            );\r\n        } catch (Exception ignored) {\r\n            request = new FontRequest(\r\n                    \"com.google.android.gms.fonts\",\r\n                    \"com.google.android.gms\",\r\n                    query\r\n            );\r\n        }\r\n\r\n        FontsContract.FontRequestCallback callback =\r\n                new FontsContract.FontRequestCallback() {\r\n                    @Override\r\n                    public void onTypefaceRetrieved(Typeface typeface) {\r\n                        sampleText.setText(R.string.sample_text);\r\n                        sampleText.setTypeface(typeface);\r\n                        selectedTypeface = typeface;\r\n                    }\r\n\r\n                    @SuppressLint({\"RestrictedApi\", \"SwitchIntDef\"})\r\n                    @Override\r\n                    public void onTypefaceRequestFailed(int reason) {\r\n                        view.findViewById(R.id.btn_select).setEnabled(false);\r\n                        switch (reason) {\r\n                            case FontsContract.FontRequestCallback.FAIL_REASON_FONT_LOAD_ERROR:\r\n                                sampleText.setText(R.string.flf);\r\n                                break;\r\n                            case FontsContract.FontRequestCallback.FAIL_REASON_FONT_NOT_FOUND:\r\n                                sampleText.setText(R.string.fnf);\r\n                                break;\r\n                            case FontsContract.FontRequestCallback.FAIL_REASON_FONT_UNAVAILABLE:\r\n                                sampleText.setText(R.string.fu);\r\n                                break;\r\n                            case FontsContract.FontRequestCallback.FAIL_REASON_MALFORMED_QUERY:\r\n                                sampleText.setText(R.string.fqm);\r\n                                break;\r\n                            case FontsContract.FontRequestCallback.FAIL_REASON_PROVIDER_NOT_FOUND:\r\n                                sampleText.setText(R.string.fpnf);\r\n                                break;\r\n                            case FontsContract.FontRequestCallback.FAIL_REASON_WRONG_CERTIFICATES:\r\n                                sampleText.setText(R.string.wc);\r\n                                break;\r\n                            default:\r\n                                break;\r\n                        }\r\n                    }\r\n                };\r\n        FontsContract.requestFonts(requireContext(), request, handler, new CancellationSignal(), callback);\r\n    }\r\n\r\n    private void requestFontLegacy(String query) {\r\n        androidx.core.provider.FontRequest request = new androidx.core.provider.FontRequest(\r\n                \"com.google.android.gms.fonts\",\r\n                \"com.google.android.gms\",\r\n                query,\r\n                R.array.com_google_android_gms_fonts_certs\r\n        );\r\n        FontsContractCompat.FontRequestCallback callback =\r\n                new FontsContractCompat.FontRequestCallback() {\r\n                    @Override\r\n                    public void onTypefaceRetrieved(Typeface typeface) {\r\n                        sampleText.setText(R.string.sample_text);\r\n                        sampleText.setTypeface(typeface);\r\n                    }\r\n\r\n                    @SuppressLint(\"RestrictedApi\")\r\n                    @Override\r\n                    public void onTypefaceRequestFailed(int reason) {\r\n                        switch (reason) {\r\n                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_FONT_LOAD_ERROR:\r\n                                sampleText.setText(R.string.flf);\r\n                                break;\r\n                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_FONT_NOT_FOUND:\r\n                                sampleText.setText(R.string.fnf);\r\n                                break;\r\n                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_FONT_UNAVAILABLE:\r\n                                sampleText.setText(R.string.fu);\r\n                                break;\r\n                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_MALFORMED_QUERY:\r\n                                sampleText.setText(R.string.fqm);\r\n                                break;\r\n                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_PROVIDER_NOT_FOUND:\r\n                                sampleText.setText(R.string.fpnf);\r\n                                break;\r\n                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_SECURITY_VIOLATION:\r\n                                sampleText.setText(R.string.sv);\r\n                                break;\r\n                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_WRONG_CERTIFICATES:\r\n                                sampleText.setText(R.string.wc);\r\n                                break;\r\n                            case FontsContractCompat.FontRequestCallback.RESULT_OK:\r\n                                sampleText.setText(R.string.fl);\r\n                                break;\r\n                            default:\r\n                                break;\r\n                        }\r\n                    }\r\n                };\r\n        FontsContractCompat.requestFont(requireContext(), request, callback, handler);\r\n    }\r\n\r\n    @Override\r\n    public void onDestroy() {\r\n        super.onDestroy();\r\n        handlerThread.quit();\r\n    }\r\n\r\n    @Override\r\n    public void dismiss() {\r\n        super.dismiss();\r\n        onDestroy();\r\n    }\r\n\r\n    public interface FontListener {\r\n        void onFontSelectedListener(Font lastSelectedFont, Typeface lastSelectedTypeface);\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- BadasManager/src/main/java/com/badas/badasstyle/FontDownloader/FontDialogFragment.java	(revision 351dabbd129e62e56bb19d8c88a3dc6f007487ff)
++++ BadasManager/src/main/java/com/badas/badasstyle/FontDownloader/FontDialogFragment.java	(date 1603180801078)
+@@ -1,395 +1,156 @@
+ package com.badas.badasstyle.FontDownloader;
+ 
+-import android.annotation.SuppressLint;
+-import android.annotation.TargetApi;
+-import android.content.Context;
+-import android.content.res.Resources;
+-import android.graphics.Typeface;
+-import android.os.Build;
++import android.animation.Animator;
++import android.animation.AnimatorListenerAdapter;
++import android.app.Dialog;
++import android.content.res.ColorStateList;
+ import android.os.Bundle;
+-import android.os.CancellationSignal;
+-import android.os.Handler;
+-import android.os.HandlerThread;
+-import android.provider.FontRequest;
+-import android.provider.FontsContract;
+-import android.text.method.LinkMovementMethod;
+ import android.view.LayoutInflater;
++import android.view.MenuItem;
+ import android.view.View;
+ import android.view.ViewGroup;
+-import android.view.inputmethod.InputMethodManager;
+-import android.widget.ArrayAdapter;
+-import android.widget.AutoCompleteTextView;
++import android.widget.CompoundButton;
+ import android.widget.TextView;
++import android.widget.Toolbar;
+ 
+ import androidx.annotation.NonNull;
+-import androidx.annotation.Nullable;
+-import androidx.core.provider.FontsContractCompat;
++import androidx.fragment.app.DialogFragment;
++import androidx.fragment.app.FragmentManager;
+ 
+-import com.badas.badasstyle.FontDownloader.FontQuery.GoogleFontsQuery;
+ import com.badas.badasstyle.R;
+-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+-import com.google.android.material.button.MaterialButton;
+-import com.google.android.material.chip.Chip;
+-import com.google.android.material.chip.ChipGroup;
+ import com.google.android.material.slider.LabelFormatter;
+ import com.google.android.material.slider.Slider;
++import com.google.android.material.switchmaterial.SwitchMaterial;
+ 
+ import java.text.DecimalFormat;
+ import java.text.MessageFormat;
+-import java.util.ArrayList;
+-import java.util.List;
+-
+-@TargetApi(26)
+-public class FontDialogFragment extends BottomSheetDialogFragment {
+-    private final String apiKey;
+-    private View view;
+-    private ChipGroup chipGroup;
+-    private AutoCompleteTextView fontSearch;
+-    private MaterialButton loadFont;
+-    private TextView sampleText;
+-    private List<Font> fontList = new ArrayList<>();
+-    private Font selected;
+-    private HandlerThread handlerThread;
+-    private Handler handler;
+-    private boolean showRelativeFS = false;
+-    private Typeface selectedTypeface;
+-    private Font selectedFont;
+-    private FontListener fontListener;
++import java.util.Objects;
+ 
+-    public FontDialogFragment(String apiKey) {
+-        this.apiKey = apiKey;
+-    }
++/**
++ * Project: BadasSolution
++ * By: Seanf
++ * Created: 17,October,2020
++ */
++public class FontDialogFragment extends DialogFragment {
++    private Toolbar toolbar;
+ 
+-    public void setFontListener(FontListener fontListener) {
+-        this.fontListener = fontListener;
++    public static FontDialogFragment display(FragmentManager fragmentManager) {
++        FontDialogFragment fontDialogFragment = new FontDialogFragment();
++        fontDialogFragment.show(fragmentManager, "FontDialogFragment");
++        return fontDialogFragment;
+     }
+ 
+-    @Nullable
+     @Override
+-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+-                             @Nullable Bundle savedInstanceState) {
+-        view = inflater.inflate(R.layout.font_bottomsheet, container, false);
+-        init();
+-        return view;
++    public void onCreate(Bundle savedInstanceState) {
++        super.onCreate(savedInstanceState);
++        setStyle(DialogFragment.STYLE_NORMAL, R.style.BadasTheme_FullScreenDialog);
+     }
+ 
+-    private void init() {
+-        ((TextView) view.findViewById(R.id.attribute)).setMovementMethod(LinkMovementMethod.getInstance());
+-
+-        handlerThread = new HandlerThread("fontThread");
+-        handlerThread.start();
+-        handler = new Handler(handlerThread.getLooper());
++    @Override
++    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
++        super.onCreateView(inflater, container, savedInstanceState);
++        final View view = inflater.inflate(R.layout.font_dialog, container, false);
++        toolbar = view.findViewById(R.id.toolbar);
+ 
+-        Slider slider = view.findViewById(R.id.fontSize);
+-        if (showRelativeFS) {
+-            view.findViewById(R.id.tv_deviceFontData).setVisibility(View.VISIBLE);
+-            ((TextView) view.findViewById(R.id.tv_deviceFontData))
+-                    .setText(MessageFormat.format("{0}{1}{2}{3}", getString(R.string.dfs), new DecimalFormat("0.##").format(getResources().getConfiguration().fontScale), getString(R.string.rfs), new DecimalFormat("0.00 px").format(getResources().getConfiguration().fontScale * slider.getValue())));
+-        }
+-        ((TextView) view.findViewById(R.id.fontSizeText)).setText(new DecimalFormat("0.## sp").format(slider.getValue()));
+-        slider.addOnChangeListener(new Slider.OnChangeListener() {
++        SwitchMaterial sm_customFontSize = view.findViewById(R.id.sm_customFontSize);
++        sm_customFontSize.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
++            @Override
++            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
++                if (isChecked)
++                    view.findViewById(R.id.cl_scale).animate()
++                            .translationY(0)
++                            .alpha(1.0f)
++                            .setDuration(requireContext().getResources().getInteger(android.R.integer.config_shortAnimTime))
++                            .setListener(new AnimatorListenerAdapter() {
++                                @Override
++                                public void onAnimationStart(Animator animation) {
++                                    super.onAnimationStart(animation);
++                                    view.findViewById(R.id.cl_scale).setVisibility(View.VISIBLE);
++                                }
++                            });
++                else
++                    view.findViewById(R.id.cl_scale).animate()
++                            .translationY(view.findViewById(R.id.cl_scale).getHeight()*-1)
++                            .alpha(0.0f)
++                            .setDuration(requireContext().getResources().getInteger(android.R.integer.config_shortAnimTime))
++                            .setListener(new AnimatorListenerAdapter() {
++                                @Override
++                                public void onAnimationEnd(Animator animation) {
++                                    super.onAnimationEnd(animation);
++                                    view.findViewById(R.id.cl_scale).setVisibility(View.GONE);
++                                }
++                            });
++            }
++        });
++
++        final Slider sldr_FontSize = view.findViewById(R.id.sldr_customeFontSize);
++        sldr_FontSize.addOnChangeListener(new Slider.OnChangeListener() {
+             @Override
+             public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                 if (value < 12) {
+-                    ((TextView) view.findViewById(R.id.fontSizeText)).setTextColor(getResources().getColor(R.color.design_default_color_error, null));
++                    sldr_FontSize.setThumbTintList(new ColorStateList(
++                            new int[][]{
++                                    new int[]{android.R.attr.state_enabled},
++                            },
++                            new int[] {
++                                    getResources().getColor(R.color.design_default_color_error, null),
++                            }
++                    ));
+                 } else {
+-                    ((TextView) view.findViewById(R.id.fontSizeText)).setTextColor(((TextView) view.findViewById(R.id.tv_deviceFontData)).getTextColors());
++                    sldr_FontSize.setThumbTintList(new ColorStateList(
++                            new int[][]{
++                                    new int[]{android.R.attr.state_enabled},
++                            },
++                            new int[] {
++                                    getResources().getColor(R.color.colorPrimary, null),
++                            }
++                    ));
+                 }
+-                ((TextView) view.findViewById(R.id.fontSizeText)).setText(new DecimalFormat("0.## sp").format(value));
+-                ((TextView) view.findViewById(R.id.tv_deviceFontData)).setText(MessageFormat.format("{0}{1}{2}{3}", getString(R.string.dfs), new DecimalFormat("0.##").format(getResources().getConfiguration().fontScale), getString(R.string.rfs), new DecimalFormat("0.00 px").format(getResources().getConfiguration().fontScale * value)));
+-                sampleText.setTextSize(value);
++//                ((TextView) view.findViewById(R.id.fontSizeText)).setText(new DecimalFormat("0.## sp").format(value));
++//                ((TextView) view.findViewById(R.id.tv_deviceFontData)).setText(MessageFormat.format("{0}{1}{2}{3}", getString(R.string.dfs), new DecimalFormat("0.##").format(getResources().getConfiguration().fontScale), getString(R.string.rfs), new DecimalFormat("0.00 px").format(getResources().getConfiguration().fontScale * value)));
++//                sampleText.setTextSize(value);
+             }
+         });
+-        slider.setLabelFormatter(new LabelFormatter() {
++        sldr_FontSize.setLabelFormatter(new LabelFormatter() {
+             @NonNull
+             @Override
+             public String getFormattedValue(float value) {
+                 return new DecimalFormat("0.## sp").format(value);
+             }
+         });
+-        chipGroup = view.findViewById(R.id.chipGroup);
+-        fontSearch = view.findViewById(R.id.actv_fontSearch);
+-        chipGroup.setVisibility(View.GONE);
+-        loadFont = view.findViewById(R.id.btn_load);
+-        sampleText = view.findViewById(R.id.sampleText);
+-        sampleText.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels / 4);
+-
+-        chipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
+-            @Override
+-            public void onCheckedChanged(ChipGroup group, int checkedId) {
+-                try {
+-                    Chip chip = view.findViewById(checkedId);
+-                    for (int i = 0; i < selected.getVariants().length; i++) {
+-                        if (selected.getVariants()[i].equalsIgnoreCase(chip.getTag().toString())) {
+-                            loadFont(new GoogleFontsQuery(selected.getFamily())
+-                                    .extractVariant(selected.getVariants()[i])
+-                                    .Build());
+-                            return;
+-                        }
+-                    }
+-                } catch (Exception ignored) {
+-                    sampleText.setText(R.string.sfv);
+-                }
+-
+-            }
+-        });
+-
+-        loadFont.setOnClickListener(new View.OnClickListener() {
+-            @Override
+-            public void onClick(View v) {
+-                sampleText.setText(R.string.loading_font);
+-                sampleText.setTypeface(null);
+-                fontSearch.clearFocus();
+-                selected = null;
+-                InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+-                if (imm != null) {
+-                    imm.hideSoftInputFromWindow(fontSearch.getWindowToken(), 0);
+-                }
+-                for (int i = 0; i < fontList.size(); i++) {
+-                    if (fontSearch.getText().toString().equalsIgnoreCase(fontList.get(i).getFamily())) {
+-                        selected = fontList.get(i);
+-                        loadVariantChips(selected.getVariants());
+-                        view.findViewById(R.id.btn_select).requestFocus();
+-                        ((MaterialButton) view.findViewById(R.id.btn_select)).setText(MessageFormat.format("{0} {1}", getString(R.string.selected_font), selected.getFamily()));
+-                        break;
+-                    }
+-                }
+-                view.findViewById(R.id.btn_select).setEnabled(true);
+-                if (selected == null) {
+-                    sampleText.setText(R.string.pevff);
+-                    selectedTypeface = null;
+-                    view.findViewById(R.id.btn_select).setEnabled(false);
+-                    ((MaterialButton) view.findViewById(R.id.btn_select)).setText(R.string.select_font_null);
+-                }
+-                selectedFont = selected;
+-            }
+-        });
+ 
+-        new FontDownloader()
+-                .setJsonLabels(FontDownloader.FontJsonLabels.GOOGLE_FONT_JSON_LABELS)
+-                .requestListDownload(FontDownloader.ApiLinks.GOOGLE_FONTS_API_NO_KEY,
+-                        apiKey,
+-                        new FontDownloader.FontListDownloaderCallback() {
+-                            @Override
+-                            public void onFontsReceived(String result) {
+-
+-                            }
++        return view;
++    }
+ 
+-                            @Override
+-                            public void onFontsReceived(List<Font> fonts) {
+-                                fontList = fonts;
+-                                fontSearch.setEnabled(true);
+-                                loadFont.setEnabled(true);
+-                                view.findViewById(R.id.til_fontSearch).setEnabled(true);
+-                                fontSearch.requestFocus();
+-                                //https://stackoverflow.com/a/7291048
+-                                InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+-                                if (imm != null) {
+-                                    imm.showSoftInput(fontSearch, InputMethodManager.SHOW_IMPLICIT);
+-                                }
+-                                fontSearch.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, Font.getFontFamilies(fontList)));
+-                            }
++    @Override
++    public void onStart() {
++        super.onStart();
++        Dialog dialog = getDialog();
++        if (dialog != null) {
++            int width = ViewGroup.LayoutParams.MATCH_PARENT;
++            int height = ViewGroup.LayoutParams.MATCH_PARENT;
++            Objects.requireNonNull(dialog.getWindow()).setLayout(width, height);
++            dialog.getWindow().setWindowAnimations(R.style.BadasTheme_Slide);
++        }
++    }
+ 
+-                            @Override
+-                            public void onFailed(Exception e) {
+-                                view.findViewById(R.id.btn_select).setEnabled(false);
+-                            }
+-                        });
+-
+-        view.findViewById(R.id.btn_select).setOnClickListener(new View.OnClickListener() {
++    @Override
++    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
++        super.onViewCreated(view, savedInstanceState);
++        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+-                try {
+-                    fontListener.onFontSelectedListener(selectedFont, selectedTypeface);
+-                } catch (Exception ignored) {
+-
+-                }
+-                dismissAllowingStateLoss();
++                dismiss();
+             }
+         });
+-    }
+-
+-    public void loadVariantChips(String[] variants) {
+-        chipGroup.removeAllViews();
+-        try {
+-            chipGroup.clearCheck();
+-        } catch (Exception ignored) {
+-
+-        }
+-        Chip child;
+-        for (String variant : variants) {
+-            child = (Chip) LayoutInflater.from(view.getContext())
+-                    .inflate(R.layout.font_chip, chipGroup, false);
+-            child.setId(variant.hashCode());
+-            child.setText(variant);
+-            child.setTag(variant);
+-            if (variant.contains("italic")) {
+-                child.setTypeface(null, Typeface.ITALIC);
+-                if (!variant.equals("italic"))
+-                    child.setText(variant.replace("italic", " italic"));
+-            }
+-
+-            chipGroup.addView(child);
+-            if (variant.contains("regular"))
+-                chipGroup.check(variant.hashCode());
+-        }
+-        if (chipGroup.getCheckedChipId() == -1)
+-            chipGroup.check(variants[0].hashCode());
+-        chipGroup.setVisibility(View.VISIBLE);
+-    }
+-
+-    public FontDialogFragment showRelativeFontSize() {
+-        showRelativeFS = true;
+-        try {
+-            view.findViewById(R.id.tv_deviceFontData).setVisibility(View.VISIBLE);
+-        } catch (Exception ignored) {
+-
+-        }
+-        return this;
+-    }
+-
+-    private void loadFont(String query) {
+-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+-            requestFont(query);
+-        } else {
+-            requestFontLegacy(query);
+-        }
+-    }
+-
+-    private List<List<byte[]>> getCertificate() {
+-        byte[] dev = getResources().getStringArray(R.array.com_google_android_gms_fonts_certs_dev)[0].getBytes();
+-        byte[] prod = getResources().getStringArray(R.array.com_google_android_gms_fonts_certs_prod)[0].getBytes();
+-        List<byte[]> com_google_android_gms_fonts_certs_dev = new ArrayList<>();
+-        com_google_android_gms_fonts_certs_dev.add(dev);
+-        List<byte[]> com_google_android_gms_fonts_certs_prod = new ArrayList<>();
+-        com_google_android_gms_fonts_certs_prod.add(prod);
+-        List<List<byte[]>> com_google_android_gms_fonts_certs = new ArrayList<>();
+-        com_google_android_gms_fonts_certs.add(com_google_android_gms_fonts_certs_dev);
+-        com_google_android_gms_fonts_certs.add(com_google_android_gms_fonts_certs_prod);
+-        return com_google_android_gms_fonts_certs;
+-    }
+-
+-    private void requestFont(String query) {
+-        FontRequest request;
+-        try {
+-            request = new FontRequest(
+-                    "com.google.android.gms.fonts",
+-                    "com.google.android.gms",
+-                    query,
+-                    getCertificate()
+-            );
+-        } catch (Exception ignored) {
+-            request = new FontRequest(
+-                    "com.google.android.gms.fonts",
+-                    "com.google.android.gms",
+-                    query
+-            );
+-        }
+-
+-        FontsContract.FontRequestCallback callback =
+-                new FontsContract.FontRequestCallback() {
+-                    @Override
+-                    public void onTypefaceRetrieved(Typeface typeface) {
+-                        sampleText.setText(R.string.sample_text);
+-                        sampleText.setTypeface(typeface);
+-                        selectedTypeface = typeface;
+-                    }
+-
+-                    @SuppressLint({"RestrictedApi", "SwitchIntDef"})
+-                    @Override
+-                    public void onTypefaceRequestFailed(int reason) {
+-                        view.findViewById(R.id.btn_select).setEnabled(false);
+-                        switch (reason) {
+-                            case FontsContract.FontRequestCallback.FAIL_REASON_FONT_LOAD_ERROR:
+-                                sampleText.setText(R.string.flf);
+-                                break;
+-                            case FontsContract.FontRequestCallback.FAIL_REASON_FONT_NOT_FOUND:
+-                                sampleText.setText(R.string.fnf);
+-                                break;
+-                            case FontsContract.FontRequestCallback.FAIL_REASON_FONT_UNAVAILABLE:
+-                                sampleText.setText(R.string.fu);
+-                                break;
+-                            case FontsContract.FontRequestCallback.FAIL_REASON_MALFORMED_QUERY:
+-                                sampleText.setText(R.string.fqm);
+-                                break;
+-                            case FontsContract.FontRequestCallback.FAIL_REASON_PROVIDER_NOT_FOUND:
+-                                sampleText.setText(R.string.fpnf);
+-                                break;
+-                            case FontsContract.FontRequestCallback.FAIL_REASON_WRONG_CERTIFICATES:
+-                                sampleText.setText(R.string.wc);
+-                                break;
+-                            default:
+-                                break;
+-                        }
+-                    }
+-                };
+-        FontsContract.requestFonts(requireContext(), request, handler, new CancellationSignal(), callback);
+-    }
+-
+-    private void requestFontLegacy(String query) {
+-        androidx.core.provider.FontRequest request = new androidx.core.provider.FontRequest(
+-                "com.google.android.gms.fonts",
+-                "com.google.android.gms",
+-                query,
+-                R.array.com_google_android_gms_fonts_certs
+-        );
+-        FontsContractCompat.FontRequestCallback callback =
+-                new FontsContractCompat.FontRequestCallback() {
+-                    @Override
+-                    public void onTypefaceRetrieved(Typeface typeface) {
+-                        sampleText.setText(R.string.sample_text);
+-                        sampleText.setTypeface(typeface);
+-                    }
+-
+-                    @SuppressLint("RestrictedApi")
+-                    @Override
+-                    public void onTypefaceRequestFailed(int reason) {
+-                        switch (reason) {
+-                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_FONT_LOAD_ERROR:
+-                                sampleText.setText(R.string.flf);
+-                                break;
+-                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_FONT_NOT_FOUND:
+-                                sampleText.setText(R.string.fnf);
+-                                break;
+-                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_FONT_UNAVAILABLE:
+-                                sampleText.setText(R.string.fu);
+-                                break;
+-                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_MALFORMED_QUERY:
+-                                sampleText.setText(R.string.fqm);
+-                                break;
+-                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_PROVIDER_NOT_FOUND:
+-                                sampleText.setText(R.string.fpnf);
+-                                break;
+-                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_SECURITY_VIOLATION:
+-                                sampleText.setText(R.string.sv);
+-                                break;
+-                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_WRONG_CERTIFICATES:
+-                                sampleText.setText(R.string.wc);
+-                                break;
+-                            case FontsContractCompat.FontRequestCallback.RESULT_OK:
+-                                sampleText.setText(R.string.fl);
+-                                break;
+-                            default:
+-                                break;
+-                        }
+-                    }
+-                };
+-        FontsContractCompat.requestFont(requireContext(), request, callback, handler);
+-    }
+-
+-    @Override
+-    public void onDestroy() {
+-        super.onDestroy();
+-        handlerThread.quit();
+-    }
+-
+-    @Override
+-    public void dismiss() {
+-        super.dismiss();
+-        onDestroy();
++        toolbar.setTitle("Font Modifier");
++//        toolbar.inflateMenu(R.menu);
++        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
++            @Override
++            public boolean onMenuItemClick(MenuItem item) {
++                dismiss();
++                return true;
++            }
++        });
+     }
+-
+-    public interface FontListener {
+-        void onFontSelectedListener(Font lastSelectedFont, Typeface lastSelectedTypeface);
+-    }
+-}
+\ No newline at end of file
++}
+Index: BadasManager/src/main/res/values/styles.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><resources>\r\n    <style name=\"BadasTheme\" parent=\"Theme.MaterialComponents.Light\">\r\n        <item name=\"isLightTheme\">true</item>\r\n        <item name=\"isMaterialTheme\">true</item>\r\n        <item name=\"colorPrimary\">@color/colorPrimary</item>\r\n        <item name=\"colorPrimaryDark\">@color/colorPrimaryDark</item>\r\n        <item name=\"colorAccent\">@color/colorAccent</item>\r\n        <item name=\"colorSecondary\">@color/colorAccent</item>\r\n        <item name=\"colorOnSecondary\">@color/colorOnAccent</item>\r\n\r\n        <item name=\"android:statusBarColor\">?attr/colorSurface</item>\r\n        <item name=\"android:windowLightStatusBar\">@bool/isLight</item>\r\n        <item name=\"backgroundColor\">@color/colorBackground</item>\r\n        <item name=\"android:windowBackground\">@color/colorBackground</item>\r\n        <item name=\"colorSurface\">@color/colorSurface</item>\r\n        <item name=\"colorOnSurface\">@color/colorOnSurface</item>\r\n\r\n        <item name=\"fontFamily\">@font/lato_regular</item>\r\n\r\n        <item name=\"toolbarStyle\">@style/BadasTheme.Toolbar</item>\r\n        <item name=\"navigationViewStyle\">@style/BadasTheme.NavigationView</item>\r\n        <item name=\"appBarLayoutStyle\">@style/BadasTheme.AppBarOverlay</item>\r\n        <item name=\"floatingActionButtonStyle\">@style/BadasTheme.FloatingActionButton</item>\r\n        <item name=\"extendedFloatingActionButtonStyle\">@style/BadasTheme.ExtendedFloatingActionButton.Icon</item>\r\n    </style>\r\n\r\n    <style name=\"BadasTheme.NoActionBar\">\r\n        <item name=\"windowActionBar\">false</item>\r\n        <item name=\"windowNoTitle\">true</item>\r\n    </style>\r\n\r\n    <style name=\"BadasTheme.AppBarOverlay\" parent=\"ThemeOverlay.MaterialComponents.ActionBar\"/>\r\n\r\n    <style name=\"BadasTheme.PopupOverlay\" parent=\"ThemeOverlay.MaterialComponents.Light\" />\r\n\r\n    <style name=\"BadasTheme.Toolbar\" parent=\"Widget.MaterialComponents.Toolbar.Surface\">\r\n        <item name=\"popupTheme\">@style/BadasTheme.PopupOverlay</item>\r\n    </style>\r\n\r\n    <style name=\"BadasTheme.FloatingActionButton\" parent=\"Widget.MaterialComponents.FloatingActionButton\">\r\n        <item name=\"shapeAppearanceOverlay\">@style/ShapeAppearance.BadasTheme.SmallComponent</item>\r\n        <item name=\"materialThemeOverlay\">@style/ThemeOverlay.BadasTheme.FloatingActionButton</item>\r\n    </style>\r\n\r\n    <style name=\"BadasTheme.ExtendedFloatingActionButton.Icon\" parent=\"Widget.MaterialComponents.ExtendedFloatingActionButton.Icon\">\r\n        <item name=\"materialThemeOverlay\">@style/ThemeOverlay.BadasTheme.FloatingActionButton</item>\r\n        <item name=\"shapeAppearanceOverlay\"> @style/ShapeAppearance.BadasTheme.SmallComponent</item>\r\n    </style>\r\n\r\n    <style name=\"BadasTheme.ExtendedFloatingActionButton\" parent=\"Widget.MaterialComponents.ExtendedFloatingActionButton\">\r\n        <item name=\"materialThemeOverlay\">@style/ThemeOverlay.BadasTheme.FloatingActionButton</item>\r\n        <item name=\"shapeAppearanceOverlay\"> @style/ShapeAppearance.BadasTheme.SmallComponent</item>\r\n    </style>\r\n\r\n    <style name=\"ThemeOverlay.BadasTheme.FloatingActionButton\" parent=\"\">\r\n        <item name=\"colorSecondary\">@color/colorAccent</item>\r\n        <item name=\"colorOnSecondary\">@color/colorOnAccent</item>\r\n        <item name=\"colorOnSurface\">@color/colorOnSurface</item>\r\n    </style>\r\n\r\n    <style name=\"ShapeAppearance.BadasTheme.Menu\" parent=\"ShapeAppearance.MaterialComponents.SmallComponent\">\r\n        <item name=\"cornerFamily\">rounded</item>\r\n        <item name=\"cornerSizeTopRight\">20%</item>\r\n        <item name=\"cornerSizeTopLeft\">10%</item>\r\n        <item name=\"cornerSizeBottomRight\">20%</item>\r\n        <item name=\"cornerSizeBottomLeft\">10%</item>\r\n    </style>\r\n\r\n    <style name=\"ShapeAppearance.BadasTheme.SmallComponent\" parent=\"ShapeAppearance.MaterialComponents.SmallComponent\">\r\n        <item name=\"cornerFamily\">rounded</item>\r\n        <item name=\"cornerSize\">45%</item>\r\n    </style>\r\n\r\n    <style name=\"ShapeAppearance.BadasTheme.MediumComponent\" parent=\"ShapeAppearance.MaterialComponents.MediumComponent\">\r\n        <item name=\"cornerFamily\">rounded</item>\r\n        <item name=\"cornerSize\">45%</item>\r\n    </style>\r\n\r\n    <style name=\"ShapeAppearance.BadasTheme.Profile\" parent=\"ShapeAppearance.MaterialComponents.MediumComponent\">\r\n        <item name=\"cornerFamily\">rounded</item>\r\n        <item name=\"cornerSize\">50%</item>\r\n    </style>\r\n\r\n    <style name=\"ShapeAppearance.BadasTheme.ProfileType\" parent=\"ShapeAppearance.MaterialComponents.SmallComponent\">\r\n        <item name=\"cornerFamily\">rounded</item>\r\n        <item name=\"cornerSize\">50%</item>\r\n        <item name=\"strokeWidth\">2dp</item>\r\n        <item name=\"strokeColor\">@color/colorPrimary</item>\r\n    </style>\r\n\r\n    <style name=\"ShapeAppearance.BadasTheme.LargeComponent\" parent=\"ShapeAppearance.MaterialComponents.LargeComponent\">\r\n        <item name=\"cornerFamily\">rounded</item>\r\n        <item name=\"cornerSize\">50%</item>\r\n    </style>\r\n\r\n    <style name=\"BadasTheme.NavigationView.Popup\" parent=\"Widget.AppCompat.PopupMenu\">\r\n        <item name=\"itemShapeFillColor\">@drawable/drawer_item</item>\r\n        <item name=\"itemTextColor\">@drawable/drawer_item_text_color</item>\r\n    </style>\r\n\r\n    <style name=\"BadasTheme.NavigationView\" parent=\"Widget.MaterialComponents.NavigationView\">\r\n        <item name=\"itemShapeAppearance\">@style/ShapeAppearance.BadasTheme.Menu</item>\r\n        <item name=\"itemShapeFillColor\">@drawable/drawer_item</item>\r\n        <item name=\"itemBackground\">@drawable/drawer_item_background</item>\r\n        <item name=\"itemTextColor\">@drawable/drawer_item_text_color</item>\r\n        <item name=\"popupMenuStyle\">@style/BadasTheme.NavigationView.Popup</item>\r\n        <item name=\"android:insetTop\">4dp</item>\r\n        <item name=\"android:insetBottom\">4dp</item>\r\n        <item name=\"android:insetLeft\">8dp</item>\r\n        <item name=\"android:insetRight\">8dp</item>\r\n    </style>\r\n\r\n    <style name=\"BadasTheme.CardTextHeader\" parent=\"TextAppearance.MaterialComponents.Headline6\">\r\n        <item name=\"android:textStyle\">bold</item>\r\n        <item name=\"android:textSize\">20sp</item>\r\n        <item name=\"android:textColor\">@color/colorOnSurface</item>\r\n    </style>\r\n\r\n    <style name=\"BadasTheme.CardText\" parent=\"TextAppearance.MaterialComponents.Body1\">\r\n        <item name=\"android:textStyle\">normal</item>\r\n        <item name=\"android:textSize\">16sp</item>\r\n        <item name=\"android:textColor\">@color/colorOnSurfaceLight</item>\r\n    </style>\r\n\r\n    <style name=\"BadasTheme.CardView\" parent=\"Widget.MaterialComponents.CardView\">\r\n        <item name=\"strokeColor\">@color/colorStroke</item>\r\n        <item name=\"cardBackgroundColor\">@color/colorSurface</item>\r\n        <item name=\"strokeWidth\">1dp</item>\r\n        <item name=\"cardElevation\">0dp</item>\r\n        <item name=\"cardCornerRadius\">8dp</item>\r\n    </style>\r\n\r\n    <style name=\"BadasTheme.Spinner\" parent=\"Platform.Widget.AppCompat.Spinner\">\r\n        <item name=\"android:spinnerMode\">dropdown</item>\r\n    </style>\r\n\r\n    <style name=\"BadasTheme.Spinner.TextView\" parent=\"android:Widget.TextView.SpinnerItem\">\r\n        <item name=\"android:textStyle\">normal</item>\r\n        <item name=\"android:textSize\">18sp</item>\r\n        <item name=\"android:textColor\">@color/colorOnSurface</item>\r\n        <item name=\"android:padding\">8dp</item>\r\n        <item name=\"android:layout_width\">match_parent</item>\r\n        <item name=\"android:layout_height\">wrap_content</item>\r\n        <item name=\"singleLine\">true</item>\r\n        <item name=\"android:gravity\">center_vertical</item>\r\n        <item name=\"android:ellipsize\">marquee</item>\r\n        <item name=\"android:dropDownSelector\">?attr/listChoiceBackgroundIndicator</item>\r\n    </style>\r\n\r\n    <style name=\"BadasTheme.Spinner.DropDown\" parent=\"BadasTheme\">\r\n        <item name=\"android:textStyle\">normal</item>\r\n        <item name=\"android:textSize\">18sp</item>\r\n        <item name=\"android:textColor\">@color/colorOnSurface</item>\r\n        <item name=\"android:paddingVertical\">2dp</item>\r\n        <item name=\"android:paddingHorizontal\">2dp</item>\r\n        <item name=\"android:layout_width\">match_parent</item>\r\n        <item name=\"android:layout_height\">wrap_content</item>\r\n        <item name=\"singleLine\">true</item>\r\n        <item name=\"android:ellipsize\">marquee</item>\r\n    </style>\r\n\r\n    <style name=\"BadasTheme.Button\" parent=\"Widget.MaterialComponents.Button.UnelevatedButton\">\r\n        <item name=\"font\">@font/lato_bold</item>\r\n    </style>\r\n\r\n    <style name=\"BadasTheme.Button.TextButton\" parent=\"Widget.MaterialComponents.Button.TextButton\">\r\n        <item name=\"font\">@font/lato_bold</item>\r\n    </style>\r\n\r\n    <style name=\"BadasTheme.Button.ErrorTextButton\" parent=\"BadasTheme.Button.TextButton\">\r\n        <item name=\"android:textColor\">@color/colorError</item>\r\n        <item name=\"rippleColor\">@color/colorError</item>\r\n    </style>\r\n</resources>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- BadasManager/src/main/res/values/styles.xml	(revision 351dabbd129e62e56bb19d8c88a3dc6f007487ff)
++++ BadasManager/src/main/res/values/styles.xml	(date 1603178216591)
+@@ -15,8 +15,6 @@
+         <item name="colorSurface">@color/colorSurface</item>
+         <item name="colorOnSurface">@color/colorOnSurface</item>
+ 
+-        <item name="fontFamily">@font/lato_regular</item>
+-
+         <item name="toolbarStyle">@style/BadasTheme.Toolbar</item>
+         <item name="navigationViewStyle">@style/BadasTheme.NavigationView</item>
+         <item name="appBarLayoutStyle">@style/BadasTheme.AppBarOverlay</item>
+@@ -31,11 +29,22 @@
+ 
+     <style name="BadasTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.ActionBar"/>
+ 
+-    <style name="BadasTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
++    <style name="BadasTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents" />
+ 
+     <style name="BadasTheme.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">
+         <item name="popupTheme">@style/BadasTheme.PopupOverlay</item>
+     </style>
++
++    <style name="BadasTheme.FullScreenDialog" parent="BadasTheme">
++        <item name="android:windowIsFloating">false</item>
++        <item name="android:statusBarColor">@color/colorStroke</item>
++        <item name="android:windowBackground">?attr/colorSurface</item>
++    </style>
++
++    <style name="BadasTheme.Slide">
++        <item name="android:windowEnterAnimation">@anim/slide_up</item>
++        <item name="android:windowExitAnimation">@anim/slide_down</item>
++    </style>
+ 
+     <style name="BadasTheme.FloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
+         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.BadasTheme.SmallComponent</item>
+@@ -160,15 +169,79 @@
+     </style>
+ 
+     <style name="BadasTheme.Button" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+-        <item name="font">@font/lato_bold</item>
+     </style>
+ 
+     <style name="BadasTheme.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+-        <item name="font">@font/lato_bold</item>
+     </style>
+ 
+     <style name="BadasTheme.Button.ErrorTextButton" parent="BadasTheme.Button.TextButton">
+         <item name="android:textColor">@color/colorError</item>
+         <item name="rippleColor">@color/colorError</item>
+     </style>
++
++    <style name="TextAppearance.BadasTheme.Headline1" parent="TextAppearance.MaterialComponents.Headline1">
++        <item name="fontFamily">@font/lato</item>
++        <item name="android:fontFamily">@font/lato</item>
++        <item name="android:textSize">101sp</item>
++    </style>
++    <style name="TextAppearance.BadasTheme.Headline2" parent="TextAppearance.MaterialComponents.Headline2">
++        <item name="fontFamily">@font/lato</item>
++        <item name="android:fontFamily">@font/lato</item>
++        <item name="android:textSize">63sp</item>
++    </style>
++    <style name="TextAppearance.BadasTheme.Headline3" parent="TextAppearance.MaterialComponents.Headline3">
++        <item name="fontFamily">@font/lato</item>
++        <item name="android:fontFamily">@font/lato</item>
++        <item name="android:textSize">50sp</item>
++    </style>
++    <style name="TextAppearance.BadasTheme.Headline4" parent="TextAppearance.MaterialComponents.Headline4">
++        <item name="fontFamily">@font/lato</item>
++        <item name="android:fontFamily">@font/lato</item>
++        <item name="android:textSize">36sp</item>
++    </style>
++    <style name="TextAppearance.BadasTheme.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
++        <item name="fontFamily">@font/lato</item>
++        <item name="android:fontFamily">@font/lato</item>
++        <item name="android:textSize">25sp</item>
++    </style>
++    <style name="TextAppearance.BadasTheme.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
++        <item name="fontFamily">@font/lato</item>
++        <item name="android:fontFamily">@font/lato</item>
++        <item name="android:textSize">21sp</item>
++    </style>
++    <style name="TextAppearance.BadasTheme.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
++        <item name="fontFamily">@font/lato</item>
++        <item name="android:fontFamily">@font/lato</item>
++        <item name="android:textSize">17sp</item>
++    </style>
++    <style name="TextAppearance.BadasTheme.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
++        <item name="fontFamily">@font/lato</item>
++        <item name="android:fontFamily">@font/lato</item>
++        <item name="android:textSize">15sp</item>
++    </style>
++    <style name="TextAppearance.BadasTheme.Body1" parent="TextAppearance.MaterialComponents.Body1">
++        <item name="fontFamily">@font/roboto_light</item>
++        <item name="android:fontFamily">@font/roboto_light</item>
++        <item name="android:textSize">16sp</item>
++    </style>
++    <style name="TextAppearance.BadasTheme.Body2" parent="TextAppearance.MaterialComponents.Body2">
++        <item name="fontFamily">@font/roboto_light</item>
++        <item name="android:fontFamily">@font/roboto_light</item>
++        <item name="android:textSize">14sp</item>
++    </style>
++    <style name="TextAppearance.BadasTheme.Button" parent="TextAppearance.MaterialComponents.Button">
++        <item name="fontFamily">@font/roboto_light</item>
++        <item name="android:fontFamily">@font/roboto_light</item>
++        <item name="android:textSize">14sp</item>
++    </style>
++    <style name="TextAppearance.BadasTheme.Caption" parent="TextAppearance.MaterialComponents.Caption">
++        <item name="fontFamily">@font/roboto_light</item>
++        <item name="android:fontFamily">@font/roboto_light</item>
++        <item name="android:textSize">12sp</item>
++    </style>
++    <style name="TextAppearance.BadasTheme.Overline" parent="TextAppearance.MaterialComponents.Overline">
++        <item name="fontFamily">@font/roboto_light</item>
++        <item name="android:fontFamily">@font/roboto_light</item>
++        <item name="android:textSize">10sp</item>
++    </style>
+ </resources>
+\ No newline at end of file
+Index: app/src/main/res/layout/fragment_placeholder.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<androidx.constraintlayout.widget.ConstraintLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\"\r\n    tools:context=\".ui.placeholder.PlaceholderFragment\">\r\n\r\n    <TextView\r\n        android:id=\"@+id/text_placeholder\"\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginStart=\"8dp\"\r\n        android:layout_marginTop=\"8dp\"\r\n        android:layout_marginEnd=\"8dp\"\r\n        android:textAlignment=\"center\"\r\n        android:textSize=\"20sp\"\r\n        app:layout_constraintBottom_toBottomOf=\"parent\"\r\n        app:layout_constraintEnd_toEndOf=\"parent\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toTopOf=\"parent\" />\r\n\r\n    <Button\r\n        android:id=\"@+id/font_button\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginTop=\"16dp\"\r\n        android:text=\"Show font dialog\"\r\n        app:layout_constraintEnd_toEndOf=\"parent\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/text_placeholder\" />\r\n\r\n</androidx.constraintlayout.widget.ConstraintLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/fragment_placeholder.xml	(revision 351dabbd129e62e56bb19d8c88a3dc6f007487ff)
++++ app/src/main/res/layout/fragment_placeholder.xml	(date 1603177510228)
+@@ -30,4 +30,14 @@
+         app:layout_constraintStart_toStartOf="parent"
+         app:layout_constraintTop_toBottomOf="@+id/text_placeholder" />
+ 
++    <Button
++        android:id="@+id/font_button2"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:layout_marginTop="8dp"
++        android:text="Show font sheet"
++        app:layout_constraintEnd_toEndOf="parent"
++        app:layout_constraintStart_toStartOf="parent"
++        app:layout_constraintTop_toBottomOf="@+id/font_button" />
++
+ </androidx.constraintlayout.widget.ConstraintLayout>
+\ No newline at end of file
+Index: app/src/main/java/com/badas/badassolution/ui/placeholder/PlaceholderFragment.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.badas.badassolution.ui.placeholder;\r\n\r\nimport android.annotation.SuppressLint;\r\nimport android.graphics.Typeface;\r\nimport android.os.Bundle;\r\nimport android.view.LayoutInflater;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\nimport android.widget.Button;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.fragment.app.Fragment;\r\n\r\nimport com.badas.badassolution.BuildConfig;\r\nimport com.badas.badassolution.R;\r\nimport com.badas.badasstyle.FontDownloader.Font;\r\nimport com.badas.badasstyle.FontDownloader.FontDialogFragment;\r\n\r\npublic class PlaceholderFragment extends Fragment {\r\n\r\n    @SuppressLint(\"SetTextI18n\")\r\n    public View onCreateView(@NonNull LayoutInflater inflater,\r\n                             ViewGroup container, Bundle savedInstanceState) {\r\n        View root = inflater.inflate(R.layout.fragment_placeholder, container, false);\r\n        final TextView textView = root.findViewById(R.id.text_placeholder);\r\n        textView.setText(\"This is a placeholder screen\");\r\n\r\n        final FontDialogFragment fontDialogFragment = new FontDialogFragment(BuildConfig.GoogleFont_Key);\r\n        fontDialogFragment.showRelativeFontSize();\r\n        fontDialogFragment.setFontListener(new FontDialogFragment.FontListener() {\r\n            @Override\r\n            public void onFontSelectedListener(Font lastSelectedFont, Typeface lastSelectedTypeface) {\r\n                Toast.makeText(requireContext(), lastSelectedFont.getFamily(), Toast.LENGTH_SHORT).show();\r\n            }\r\n\r\n        });\r\n\r\n        Button button = root.findViewById(R.id.font_button);\r\n        button.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n                fontDialogFragment\r\n                        .show(getChildFragmentManager(), \"Fonts\");\r\n            }\r\n        });\r\n        return root;\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/badas/badassolution/ui/placeholder/PlaceholderFragment.java	(revision 351dabbd129e62e56bb19d8c88a3dc6f007487ff)
++++ app/src/main/java/com/badas/badassolution/ui/placeholder/PlaceholderFragment.java	(date 1603179081456)
+@@ -16,6 +16,7 @@
+ import com.badas.badassolution.BuildConfig;
+ import com.badas.badassolution.R;
+ import com.badas.badasstyle.FontDownloader.Font;
++import com.badas.badasstyle.FontDownloader.FontBottomDialogFragment;
+ import com.badas.badasstyle.FontDownloader.FontDialogFragment;
+ 
+ public class PlaceholderFragment extends Fragment {
+@@ -27,9 +28,10 @@
+         final TextView textView = root.findViewById(R.id.text_placeholder);
+         textView.setText("This is a placeholder screen");
+ 
+-        final FontDialogFragment fontDialogFragment = new FontDialogFragment(BuildConfig.GoogleFont_Key);
+-        fontDialogFragment.showRelativeFontSize();
+-        fontDialogFragment.setFontListener(new FontDialogFragment.FontListener() {
++        final FontBottomDialogFragment fontBottomDialogFragment =
++                new FontBottomDialogFragment(BuildConfig.GoogleFont_Key)
++                .showRelativeFontSize();
++        fontBottomDialogFragment.setFontListener(new FontBottomDialogFragment.FontListener() {
+             @Override
+             public void onFontSelectedListener(Font lastSelectedFont, Typeface lastSelectedTypeface) {
+                 Toast.makeText(requireContext(), lastSelectedFont.getFamily(), Toast.LENGTH_SHORT).show();
+@@ -41,8 +43,15 @@
+         button.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+-                fontDialogFragment
+-                        .show(getChildFragmentManager(), "Fonts");
++                FontDialogFragment.display(getChildFragmentManager());
++            }
++        });
++
++        Button button2 = root.findViewById(R.id.font_button2);
++        button2.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                fontBottomDialogFragment.show(getChildFragmentManager(), "Fonts");
+             }
+         });
+         return root;
+Index: BadasManager/src/main/res/drawable/ic_close.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- BadasManager/src/main/res/drawable/ic_close.xml	(date 1602942695518)
++++ BadasManager/src/main/res/drawable/ic_close.xml	(date 1602942695518)
+@@ -0,0 +1,10 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="24dp"
++    android:height="24dp"
++    android:viewportWidth="24"
++    android:viewportHeight="24"
++    android:tint="?attr/colorControlNormal">
++  <path
++      android:fillColor="@android:color/black"
++      android:pathData="M19,6.41L17.59,5 12,10.59 6.41,5 5,6.41 10.59,12 5,17.59 6.41,19 12,13.41 17.59,19 19,17.59 13.41,12z"/>
++</vector>
+Index: BadasManager/src/main/res/font/roboto_light.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- BadasManager/src/main/res/font/roboto_light.xml	(date 1603178051186)
++++ BadasManager/src/main/res/font/roboto_light.xml	(date 1603178051186)
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<font-family xmlns:app="http://schemas.android.com/apk/res-auto"
++        app:fontProviderAuthority="com.google.android.gms.fonts"
++        app:fontProviderPackage="com.google.android.gms"
++        app:fontProviderQuery="name=Roboto&amp;weight=300"
++        app:fontProviderCerts="@array/com_google_android_gms_fonts_certs">
++</font-family>
+Index: BadasManager/src/main/res/font/lato.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- BadasManager/src/main/res/font/lato.xml	(date 1603178064244)
++++ BadasManager/src/main/res/font/lato.xml	(date 1603178064244)
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<font-family xmlns:app="http://schemas.android.com/apk/res-auto"
++        app:fontProviderAuthority="com.google.android.gms.fonts"
++        app:fontProviderPackage="com.google.android.gms"
++        app:fontProviderQuery="Lato"
++        app:fontProviderCerts="@array/com_google_android_gms_fonts_certs">
++</font-family>
+Index: BadasManager/src/main/res/layout/font_dialog.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- BadasManager/src/main/res/layout/font_dialog.xml	(date 1603180121051)
++++ BadasManager/src/main/res/layout/font_dialog.xml	(date 1603180121051)
+@@ -0,0 +1,87 @@
++<?xml version="1.0" encoding="utf-8"?>
++<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    xmlns:tools="http://schemas.android.com/tools"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent"
++    android:theme="@style/BadasTheme">
++
++    <com.google.android.material.appbar.AppBarLayout
++        android:id="@+id/appBarLayout"
++        android:layout_width="match_parent"
++        android:layout_height="match_parent"
++        app:elevation="0dp">
++
++        <Toolbar
++            android:id="@+id/toolbar"
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:minHeight="?android:attr/actionBarSize"
++            android:navigationIcon="@drawable/ic_close" />
++
++    </com.google.android.material.appbar.AppBarLayout>
++
++    <androidx.constraintlayout.widget.ConstraintLayout
++        android:layout_width="match_parent"
++        android:layout_height="match_parent">
++
++        <androidx.constraintlayout.widget.Guideline
++            android:id="@+id/guideline"
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:orientation="horizontal"
++            app:layout_constraintGuide_begin="?attr/actionBarSize" />
++
++        <com.google.android.material.switchmaterial.SwitchMaterial
++            android:id="@+id/sm_customFontSize"
++            android:layout_width="0dp"
++            android:layout_height="wrap_content"
++            android:layout_marginTop="16dp"
++            android:paddingHorizontal="12sp"
++            android:text="Custom font size"
++            app:layout_constraintEnd_toEndOf="parent"
++            app:layout_constraintStart_toStartOf="parent"
++            app:layout_constraintTop_toTopOf="@+id/guideline" />
++
++        <androidx.constraintlayout.widget.ConstraintLayout
++            android:id="@+id/cl_scale"
++            android:layout_width="0dp"
++            android:layout_height="wrap_content"
++            android:layout_marginTop="8dp"
++            android:visibility="gone"
++            app:layout_constraintEnd_toEndOf="parent"
++            app:layout_constraintStart_toStartOf="parent"
++            app:layout_constraintTop_toBottomOf="@+id/sm_customFontSize"
++            tools:visibility="visible">
++
++            <com.google.android.material.textview.MaterialTextView
++                android:id="@+id/tv_scale"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:layout_marginEnd="16dp"
++                android:text="Aa"
++                app:fontFamily="@font/lato"
++                app:layout_constraintBottom_toBottomOf="parent"
++                app:layout_constraintEnd_toEndOf="parent"
++                app:layout_constraintTop_toTopOf="@+id/sldr_customeFontSize" />
++
++            <com.google.android.material.slider.Slider
++                android:id="@+id/sldr_customeFontSize"
++                android:layout_width="0dp"
++                android:layout_height="wrap_content"
++                android:layout_marginEnd="8dp"
++                android:stepSize="1.0"
++                android:value="14.0"
++                android:valueFrom="8.0"
++                android:valueTo="100.0"
++                app:layout_constraintBottom_toBottomOf="parent"
++                app:layout_constraintEnd_toStartOf="@+id/tv_scale"
++                app:layout_constraintStart_toStartOf="parent"
++                app:layout_constraintTop_toTopOf="parent"
++                app:tickColorActive="#00FFFFFF"
++                app:tickColorInactive="#00FFFFFF" />
++        </androidx.constraintlayout.widget.ConstraintLayout>
++    </androidx.constraintlayout.widget.ConstraintLayout>
++
++
++</androidx.coordinatorlayout.widget.CoordinatorLayout>
+\ No newline at end of file
+Index: BadasManager/src/main/res/values/preloaded_fonts.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- BadasManager/src/main/res/values/preloaded_fonts.xml	(date 1603178064534)
++++ BadasManager/src/main/res/values/preloaded_fonts.xml	(date 1603178064534)
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="utf-8"?>
++<resources>
++    <array name="preloaded_fonts" translatable="false">
++        <item>@font/lato</item>
++        <item>@font/roboto_light</item>
++        <item>@font/roboto_mono_light</item>
++    </array>
++</resources>
+Index: BadasManager/src/main/res/font/roboto_mono_light.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- BadasManager/src/main/res/font/roboto_mono_light.xml	(date 1603177964316)
++++ BadasManager/src/main/res/font/roboto_mono_light.xml	(date 1603177964316)
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<font-family xmlns:app="http://schemas.android.com/apk/res-auto"
++        app:fontProviderAuthority="com.google.android.gms.fonts"
++        app:fontProviderPackage="com.google.android.gms"
++        app:fontProviderQuery="name=Roboto Mono&amp;weight=300"
++        app:fontProviderCerts="@array/com_google_android_gms_fonts_certs">
++</font-family>
+Index: app/google-services.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/google-services.json	(date 1603182712036)
++++ app/google-services.json	(date 1603182712036)
+@@ -0,0 +1,40 @@
++{
++  "project_info": {
++    "project_number": "121589508373",
++    "firebase_url": "https://badas-1599479178846.firebaseio.com",
++    "project_id": "badas-1599479178846",
++    "storage_bucket": "badas-1599479178846.appspot.com"
++  },
++  "client": [
++    {
++      "client_info": {
++        "mobilesdk_app_id": "1:121589508373:android:8b6bd0d708d337b891e11c",
++        "android_client_info": {
++          "package_name": "com.badas.badassolution"
++        }
++      },
++      "oauth_client": [
++        {
++          "client_id": "121589508373-2n8js4e9ufbkte0hl73svuttm43lkjh7.apps.googleusercontent.com",
++          "client_type": 3
++        }
++      ],
++      "api_key": [
++        {
++          "current_key": "AIzaSyBnsapwG45FofdB3fR_zrPj06RtkmMAsOI"
++        }
++      ],
++      "services": {
++        "appinvite_service": {
++          "other_platform_oauth_client": [
++            {
++              "client_id": "121589508373-2n8js4e9ufbkte0hl73svuttm43lkjh7.apps.googleusercontent.com",
++              "client_type": 3
++            }
++          ]
++        }
++      }
++    }
++  ],
++  "configuration_version": "1"
++}
+\ No newline at end of file
+Index: BadasManager/src/main/java/com/badas/badasstyle/FontDownloader/FontBottomDialogFragment.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- BadasManager/src/main/java/com/badas/badasstyle/FontDownloader/FontBottomDialogFragment.java	(date 1602942280555)
++++ BadasManager/src/main/java/com/badas/badasstyle/FontDownloader/FontBottomDialogFragment.java	(date 1602942280555)
+@@ -0,0 +1,395 @@
++package com.badas.badasstyle.FontDownloader;
++
++import android.annotation.SuppressLint;
++import android.annotation.TargetApi;
++import android.content.Context;
++import android.content.res.Resources;
++import android.graphics.Typeface;
++import android.os.Build;
++import android.os.Bundle;
++import android.os.CancellationSignal;
++import android.os.Handler;
++import android.os.HandlerThread;
++import android.provider.FontRequest;
++import android.provider.FontsContract;
++import android.text.method.LinkMovementMethod;
++import android.view.LayoutInflater;
++import android.view.View;
++import android.view.ViewGroup;
++import android.view.inputmethod.InputMethodManager;
++import android.widget.ArrayAdapter;
++import android.widget.AutoCompleteTextView;
++import android.widget.TextView;
++
++import androidx.annotation.NonNull;
++import androidx.annotation.Nullable;
++import androidx.core.provider.FontsContractCompat;
++
++import com.badas.badasstyle.FontDownloader.FontQuery.GoogleFontsQuery;
++import com.badas.badasstyle.R;
++import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
++import com.google.android.material.button.MaterialButton;
++import com.google.android.material.chip.Chip;
++import com.google.android.material.chip.ChipGroup;
++import com.google.android.material.slider.LabelFormatter;
++import com.google.android.material.slider.Slider;
++
++import java.text.DecimalFormat;
++import java.text.MessageFormat;
++import java.util.ArrayList;
++import java.util.List;
++
++@TargetApi(26)
++public class FontBottomDialogFragment extends BottomSheetDialogFragment {
++    private final String apiKey;
++    private View view;
++    private ChipGroup chipGroup;
++    private AutoCompleteTextView fontSearch;
++    private MaterialButton loadFont;
++    private TextView sampleText;
++    private List<Font> fontList = new ArrayList<>();
++    private Font selected;
++    private HandlerThread handlerThread;
++    private Handler handler;
++    private boolean showRelativeFS = false;
++    private Typeface selectedTypeface;
++    private Font selectedFont;
++    private FontListener fontListener;
++
++    public FontBottomDialogFragment(String apiKey) {
++        this.apiKey = apiKey;
++    }
++
++    public void setFontListener(FontListener fontListener) {
++        this.fontListener = fontListener;
++    }
++
++    @Nullable
++    @Override
++    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
++                             @Nullable Bundle savedInstanceState) {
++        view = inflater.inflate(R.layout.font_bottomsheet, container, false);
++        init();
++        return view;
++    }
++
++    private void init() {
++        ((TextView) view.findViewById(R.id.attribute)).setMovementMethod(LinkMovementMethod.getInstance());
++
++        handlerThread = new HandlerThread("fontThread");
++        handlerThread.start();
++        handler = new Handler(handlerThread.getLooper());
++
++        Slider slider = view.findViewById(R.id.fontSize);
++        if (showRelativeFS) {
++            view.findViewById(R.id.tv_deviceFontData).setVisibility(View.VISIBLE);
++            ((TextView) view.findViewById(R.id.tv_deviceFontData))
++                    .setText(MessageFormat.format("{0}{1}{2}{3}", getString(R.string.dfs), new DecimalFormat("0.##").format(getResources().getConfiguration().fontScale), getString(R.string.rfs), new DecimalFormat("0.00 px").format(getResources().getConfiguration().fontScale * slider.getValue())));
++        }
++        ((TextView) view.findViewById(R.id.fontSizeText)).setText(new DecimalFormat("0.## sp").format(slider.getValue()));
++        slider.addOnChangeListener(new Slider.OnChangeListener() {
++            @Override
++            public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
++                if (value < 12) {
++                    ((TextView) view.findViewById(R.id.fontSizeText)).setTextColor(getResources().getColor(R.color.design_default_color_error, null));
++                } else {
++                    ((TextView) view.findViewById(R.id.fontSizeText)).setTextColor(((TextView) view.findViewById(R.id.tv_deviceFontData)).getTextColors());
++                }
++                ((TextView) view.findViewById(R.id.fontSizeText)).setText(new DecimalFormat("0.## sp").format(value));
++                ((TextView) view.findViewById(R.id.tv_deviceFontData)).setText(MessageFormat.format("{0}{1}{2}{3}", getString(R.string.dfs), new DecimalFormat("0.##").format(getResources().getConfiguration().fontScale), getString(R.string.rfs), new DecimalFormat("0.00 px").format(getResources().getConfiguration().fontScale * value)));
++                sampleText.setTextSize(value);
++            }
++        });
++        slider.setLabelFormatter(new LabelFormatter() {
++            @NonNull
++            @Override
++            public String getFormattedValue(float value) {
++                return new DecimalFormat("0.## sp").format(value);
++            }
++        });
++        chipGroup = view.findViewById(R.id.chipGroup);
++        fontSearch = view.findViewById(R.id.actv_fontSearch);
++        chipGroup.setVisibility(View.GONE);
++        loadFont = view.findViewById(R.id.btn_load);
++        sampleText = view.findViewById(R.id.sampleText);
++        sampleText.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels / 4);
++
++        chipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
++            @Override
++            public void onCheckedChanged(ChipGroup group, int checkedId) {
++                try {
++                    Chip chip = view.findViewById(checkedId);
++                    for (int i = 0; i < selected.getVariants().length; i++) {
++                        if (selected.getVariants()[i].equalsIgnoreCase(chip.getTag().toString())) {
++                            loadFont(new GoogleFontsQuery(selected.getFamily())
++                                    .extractVariant(selected.getVariants()[i])
++                                    .Build());
++                            return;
++                        }
++                    }
++                } catch (Exception ignored) {
++                    sampleText.setText(R.string.sfv);
++                }
++
++            }
++        });
++
++        loadFont.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                sampleText.setText(R.string.loading_font);
++                sampleText.setTypeface(null);
++                fontSearch.clearFocus();
++                selected = null;
++                InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
++                if (imm != null) {
++                    imm.hideSoftInputFromWindow(fontSearch.getWindowToken(), 0);
++                }
++                for (int i = 0; i < fontList.size(); i++) {
++                    if (fontSearch.getText().toString().equalsIgnoreCase(fontList.get(i).getFamily())) {
++                        selected = fontList.get(i);
++                        loadVariantChips(selected.getVariants());
++                        view.findViewById(R.id.btn_select).requestFocus();
++                        ((MaterialButton) view.findViewById(R.id.btn_select)).setText(MessageFormat.format("{0} {1}", getString(R.string.selected_font), selected.getFamily()));
++                        break;
++                    }
++                }
++                view.findViewById(R.id.btn_select).setEnabled(true);
++                if (selected == null) {
++                    sampleText.setText(R.string.pevff);
++                    selectedTypeface = null;
++                    view.findViewById(R.id.btn_select).setEnabled(false);
++                    ((MaterialButton) view.findViewById(R.id.btn_select)).setText(R.string.select_font_null);
++                }
++                selectedFont = selected;
++            }
++        });
++
++        new FontDownloader()
++                .setJsonLabels(FontDownloader.FontJsonLabels.GOOGLE_FONT_JSON_LABELS)
++                .requestListDownload(FontDownloader.ApiLinks.GOOGLE_FONTS_API_NO_KEY,
++                        apiKey,
++                        new FontDownloader.FontListDownloaderCallback() {
++                            @Override
++                            public void onFontsReceived(String result) {
++
++                            }
++
++                            @Override
++                            public void onFontsReceived(List<Font> fonts) {
++                                fontList = fonts;
++                                fontSearch.setEnabled(true);
++                                loadFont.setEnabled(true);
++                                view.findViewById(R.id.til_fontSearch).setEnabled(true);
++                                fontSearch.requestFocus();
++                                //https://stackoverflow.com/a/7291048
++                                InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
++                                if (imm != null) {
++                                    imm.showSoftInput(fontSearch, InputMethodManager.SHOW_IMPLICIT);
++                                }
++                                fontSearch.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, Font.getFontFamilies(fontList)));
++                            }
++
++                            @Override
++                            public void onFailed(Exception e) {
++                                view.findViewById(R.id.btn_select).setEnabled(false);
++                            }
++                        });
++
++        view.findViewById(R.id.btn_select).setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                try {
++                    fontListener.onFontSelectedListener(selectedFont, selectedTypeface);
++                } catch (Exception ignored) {
++
++                }
++                dismissAllowingStateLoss();
++            }
++        });
++    }
++
++    public void loadVariantChips(String[] variants) {
++        chipGroup.removeAllViews();
++        try {
++            chipGroup.clearCheck();
++        } catch (Exception ignored) {
++
++        }
++        Chip child;
++        for (String variant : variants) {
++            child = (Chip) LayoutInflater.from(view.getContext())
++                    .inflate(R.layout.font_chip, chipGroup, false);
++            child.setId(variant.hashCode());
++            child.setText(variant);
++            child.setTag(variant);
++            if (variant.contains("italic")) {
++                child.setTypeface(null, Typeface.ITALIC);
++                if (!variant.equals("italic"))
++                    child.setText(variant.replace("italic", " italic"));
++            }
++
++            chipGroup.addView(child);
++            if (variant.contains("regular"))
++                chipGroup.check(variant.hashCode());
++        }
++        if (chipGroup.getCheckedChipId() == -1)
++            chipGroup.check(variants[0].hashCode());
++        chipGroup.setVisibility(View.VISIBLE);
++    }
++
++    public FontBottomDialogFragment showRelativeFontSize() {
++        showRelativeFS = true;
++        try {
++            view.findViewById(R.id.tv_deviceFontData).setVisibility(View.VISIBLE);
++        } catch (Exception ignored) {
++
++        }
++        return this;
++    }
++
++    private void loadFont(String query) {
++        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
++            requestFont(query);
++        } else {
++            requestFontLegacy(query);
++        }
++    }
++
++    private List<List<byte[]>> getCertificate() {
++        byte[] dev = getResources().getStringArray(R.array.com_google_android_gms_fonts_certs_dev)[0].getBytes();
++        byte[] prod = getResources().getStringArray(R.array.com_google_android_gms_fonts_certs_prod)[0].getBytes();
++        List<byte[]> com_google_android_gms_fonts_certs_dev = new ArrayList<>();
++        com_google_android_gms_fonts_certs_dev.add(dev);
++        List<byte[]> com_google_android_gms_fonts_certs_prod = new ArrayList<>();
++        com_google_android_gms_fonts_certs_prod.add(prod);
++        List<List<byte[]>> com_google_android_gms_fonts_certs = new ArrayList<>();
++        com_google_android_gms_fonts_certs.add(com_google_android_gms_fonts_certs_dev);
++        com_google_android_gms_fonts_certs.add(com_google_android_gms_fonts_certs_prod);
++        return com_google_android_gms_fonts_certs;
++    }
++
++    private void requestFont(String query) {
++        FontRequest request;
++        try {
++            request = new FontRequest(
++                    "com.google.android.gms.fonts",
++                    "com.google.android.gms",
++                    query,
++                    getCertificate()
++            );
++        } catch (Exception ignored) {
++            request = new FontRequest(
++                    "com.google.android.gms.fonts",
++                    "com.google.android.gms",
++                    query
++            );
++        }
++
++        FontsContract.FontRequestCallback callback =
++                new FontsContract.FontRequestCallback() {
++                    @Override
++                    public void onTypefaceRetrieved(Typeface typeface) {
++                        sampleText.setText(R.string.sample_text);
++                        sampleText.setTypeface(typeface);
++                        selectedTypeface = typeface;
++                    }
++
++                    @SuppressLint({"RestrictedApi", "SwitchIntDef"})
++                    @Override
++                    public void onTypefaceRequestFailed(int reason) {
++                        view.findViewById(R.id.btn_select).setEnabled(false);
++                        switch (reason) {
++                            case FontsContract.FontRequestCallback.FAIL_REASON_FONT_LOAD_ERROR:
++                                sampleText.setText(R.string.flf);
++                                break;
++                            case FontsContract.FontRequestCallback.FAIL_REASON_FONT_NOT_FOUND:
++                                sampleText.setText(R.string.fnf);
++                                break;
++                            case FontsContract.FontRequestCallback.FAIL_REASON_FONT_UNAVAILABLE:
++                                sampleText.setText(R.string.fu);
++                                break;
++                            case FontsContract.FontRequestCallback.FAIL_REASON_MALFORMED_QUERY:
++                                sampleText.setText(R.string.fqm);
++                                break;
++                            case FontsContract.FontRequestCallback.FAIL_REASON_PROVIDER_NOT_FOUND:
++                                sampleText.setText(R.string.fpnf);
++                                break;
++                            case FontsContract.FontRequestCallback.FAIL_REASON_WRONG_CERTIFICATES:
++                                sampleText.setText(R.string.wc);
++                                break;
++                            default:
++                                break;
++                        }
++                    }
++                };
++        FontsContract.requestFonts(requireContext(), request, handler, new CancellationSignal(), callback);
++    }
++
++    private void requestFontLegacy(String query) {
++        androidx.core.provider.FontRequest request = new androidx.core.provider.FontRequest(
++                "com.google.android.gms.fonts",
++                "com.google.android.gms",
++                query,
++                R.array.com_google_android_gms_fonts_certs
++        );
++        FontsContractCompat.FontRequestCallback callback =
++                new FontsContractCompat.FontRequestCallback() {
++                    @Override
++                    public void onTypefaceRetrieved(Typeface typeface) {
++                        sampleText.setText(R.string.sample_text);
++                        sampleText.setTypeface(typeface);
++                    }
++
++                    @SuppressLint("RestrictedApi")
++                    @Override
++                    public void onTypefaceRequestFailed(int reason) {
++                        switch (reason) {
++                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_FONT_LOAD_ERROR:
++                                sampleText.setText(R.string.flf);
++                                break;
++                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_FONT_NOT_FOUND:
++                                sampleText.setText(R.string.fnf);
++                                break;
++                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_FONT_UNAVAILABLE:
++                                sampleText.setText(R.string.fu);
++                                break;
++                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_MALFORMED_QUERY:
++                                sampleText.setText(R.string.fqm);
++                                break;
++                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_PROVIDER_NOT_FOUND:
++                                sampleText.setText(R.string.fpnf);
++                                break;
++                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_SECURITY_VIOLATION:
++                                sampleText.setText(R.string.sv);
++                                break;
++                            case FontsContractCompat.FontRequestCallback.FAIL_REASON_WRONG_CERTIFICATES:
++                                sampleText.setText(R.string.wc);
++                                break;
++                            case FontsContractCompat.FontRequestCallback.RESULT_OK:
++                                sampleText.setText(R.string.fl);
++                                break;
++                            default:
++                                break;
++                        }
++                    }
++                };
++        FontsContractCompat.requestFont(requireContext(), request, callback, handler);
++    }
++
++    @Override
++    public void onDestroy() {
++        super.onDestroy();
++        handlerThread.quit();
++    }
++
++    @Override
++    public void dismiss() {
++        super.dismiss();
++        onDestroy();
++    }
++
++    public interface FontListener {
++        void onFontSelectedListener(Font lastSelectedFont, Typeface lastSelectedTypeface);
++    }
++}
+\ No newline at end of file
+Index: build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>// Top-level build file where you can add configuration options common to all sub-projects/modules.\r\nbuildscript {\r\n    repositories {\r\n        google()\r\n        jcenter()\r\n    }\r\n    dependencies {\r\n        classpath 'com.android.tools.build:gradle:4.1.0'\r\n\r\n        // NOTE: Do not place your application dependencies here; they belong\r\n        // in the individual module build.gradle files\r\n    }\r\n}\r\n\r\nallprojects {\r\n    repositories {\r\n        google()\r\n        jcenter()\r\n        maven { url 'https://jitpack.io' }\r\n    }\r\n}\r\n\r\ntask clean(type: Delete) {\r\n    delete rootProject.buildDir\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- build.gradle	(revision 351dabbd129e62e56bb19d8c88a3dc6f007487ff)
++++ build.gradle	(date 1603182729781)
+@@ -6,6 +6,7 @@
+     }
+     dependencies {
+         classpath 'com.android.tools.build:gradle:4.1.0'
++        classpath 'com.google.gms:google-services:4.3.3'
+ 
+         // NOTE: Do not place your application dependencies here; they belong
+         // in the individual module build.gradle files
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_1_8\" default=\"true\" project-jdk-name=\"1.8\" project-jdk-type=\"JavaSDK\">\r\n    <output url=\"file://$PROJECT_DIR$/build/classes\" />\r\n  </component>\r\n  <component name=\"ProjectType\">\r\n    <option name=\"id\" value=\"Android\" />\r\n  </component>\r\n  <component name=\"jetbrains.communicator.idea.IdProvider\" IDEtalkID=\"1F7502B469278D2F8B80C7CA1ECE613B\" />\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/misc.xml	(revision 351dabbd129e62e56bb19d8c88a3dc6f007487ff)
++++ .idea/misc.xml	(date 1602942389718)
+@@ -1,5 +1,48 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
++  <component name="NullableNotNullManager">
++    <option name="myDefaultNullable" value="org.jetbrains.annotations.Nullable" />
++    <option name="myDefaultNotNull" value="androidx.annotation.NonNull" />
++    <option name="myNullables">
++      <value>
++        <list size="14">
++          <item index="0" class="java.lang.String" itemvalue="org.jetbrains.annotations.Nullable" />
++          <item index="1" class="java.lang.String" itemvalue="edu.umd.cs.findbugs.annotations.Nullable" />
++          <item index="2" class="java.lang.String" itemvalue="android.support.annotation.Nullable" />
++          <item index="3" class="java.lang.String" itemvalue="androidx.annotation.Nullable" />
++          <item index="4" class="java.lang.String" itemvalue="androidx.annotation.RecentlyNullable" />
++          <item index="5" class="java.lang.String" itemvalue="com.android.annotations.Nullable" />
++          <item index="6" class="java.lang.String" itemvalue="javax.annotation.Nullable" />
++          <item index="7" class="java.lang.String" itemvalue="javax.annotation.CheckForNull" />
++          <item index="8" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.qual.Nullable" />
++          <item index="9" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NullableDecl" />
++          <item index="10" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NullableType" />
++          <item index="11" class="java.lang.String" itemvalue="org.eclipse.jdt.annotation.Nullable" />
++          <item index="12" class="java.lang.String" itemvalue="io.reactivex.annotations.Nullable" />
++          <item index="13" class="java.lang.String" itemvalue="io.reactivex.rxjava3.annotations.Nullable" />
++        </list>
++      </value>
++    </option>
++    <option name="myNotNulls">
++      <value>
++        <list size="13">
++          <item index="0" class="java.lang.String" itemvalue="org.jetbrains.annotations.NotNull" />
++          <item index="1" class="java.lang.String" itemvalue="edu.umd.cs.findbugs.annotations.NonNull" />
++          <item index="2" class="java.lang.String" itemvalue="android.support.annotation.NonNull" />
++          <item index="3" class="java.lang.String" itemvalue="androidx.annotation.NonNull" />
++          <item index="4" class="java.lang.String" itemvalue="androidx.annotation.RecentlyNonNull" />
++          <item index="5" class="java.lang.String" itemvalue="com.android.annotations.NonNull" />
++          <item index="6" class="java.lang.String" itemvalue="javax.annotation.Nonnull" />
++          <item index="7" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.qual.NonNull" />
++          <item index="8" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NonNullDecl" />
++          <item index="9" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NonNullType" />
++          <item index="10" class="java.lang.String" itemvalue="org.eclipse.jdt.annotation.NonNull" />
++          <item index="11" class="java.lang.String" itemvalue="io.reactivex.annotations.NonNull" />
++          <item index="12" class="java.lang.String" itemvalue="io.reactivex.rxjava3.annotations.NonNull" />
++        </list>
++      </value>
++    </option>
++  </component>
+   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+     <output url="file://$PROJECT_DIR$/build/classes" />
+   </component>
+Index: FirebaseManager/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>apply plugin: 'com.android.library'\r\n\r\nandroid {\r\n    compileSdkVersion 29\r\n\r\n    defaultConfig {\r\n        minSdkVersion 26\r\n        targetSdkVersion 29\r\n        versionCode 1\r\n        versionName \"1.0\"\r\n\r\n        testInstrumentationRunner \"androidx.test.runner.AndroidJUnitRunner\"\r\n        consumerProguardFiles \"consumer-rules.pro\"\r\n    }\r\n\r\n    buildTypes {\r\n        release {\r\n            minifyEnabled false\r\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'\r\n        }\r\n    }\r\n}\r\n\r\ndependencies {\r\n    implementation fileTree(dir: \"libs\", include: [\"*.jar\"])\r\n    implementation 'androidx.appcompat:appcompat:1.2.0'\r\n    testImplementation 'junit:junit:4.13'\r\n    androidTestImplementation 'androidx.test.ext:junit:1.1.2'\r\n    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- FirebaseManager/build.gradle	(revision 351dabbd129e62e56bb19d8c88a3dc6f007487ff)
++++ FirebaseManager/build.gradle	(date 1603182729684)
+@@ -1,4 +1,5 @@
+ apply plugin: 'com.android.library'
++apply plugin: 'com.google.gms.google-services'
+ 
+ android {
+     compileSdkVersion 29
+@@ -24,6 +25,7 @@
+ dependencies {
+     implementation fileTree(dir: "libs", include: ["*.jar"])
+     implementation 'androidx.appcompat:appcompat:1.2.0'
++    implementation 'com.google.firebase:firebase-auth:19.3.1'
+     testImplementation 'junit:junit:4.13'
+     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+Index: BadasManager/src/main/res/anim/slide_up.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- BadasManager/src/main/res/anim/slide_up.xml	(date 1602947345953)
++++ BadasManager/src/main/res/anim/slide_up.xml	(date 1602947345953)
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="utf-8"?>
++<set xmlns:android="http://schemas.android.com/apk/res/android">
++    <translate
++        android:duration="@android:integer/config_shortAnimTime"
++        android:fromYDelta="100%"
++        android:interpolator="@android:anim/accelerate_interpolator"
++        android:toYDelta="0" />
++</set>
+\ No newline at end of file
+Index: BadasManager/src/main/res/anim/slide_down.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- BadasManager/src/main/res/anim/slide_down.xml	(date 1602947201841)
++++ BadasManager/src/main/res/anim/slide_down.xml	(date 1602947201841)
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="utf-8"?>
++<set xmlns:android="http://schemas.android.com/apk/res/android">
++    <translate
++        android:duration="@android:integer/config_shortAnimTime"
++        android:fromYDelta="0%p"
++        android:interpolator="@android:anim/accelerate_interpolator"
++        android:toYDelta="100%p" />
++</set>
+\ No newline at end of file
