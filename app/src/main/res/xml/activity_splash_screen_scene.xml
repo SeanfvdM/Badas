@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <ConstraintSet android:id="@+id/start" />
+    <ConstraintSet android:id="@+id/end" />
+    <Transition
+        motion:autoTransition="none"
+        motion:constraintSetEnd="@+id/end"
+        motion:constraintSetStart="@+id/start">
+        <KeyFrameSet>
+            <KeyAttribute motion:motionTarget="@+id/groupLogo" />
+            <KeyAttribute motion:motionTarget="@+id/groupLogo" />
+            <KeyAttribute
+                android:scaleX="0.7"
+                motion:framePosition="20"
+                motion:motionTarget="@+id/appLogo" />
+            <KeyAttribute
+                android:scaleY="0.7"
+                motion:framePosition="20"
+                motion:motionTarget="@+id/appLogo" />
+            <KeyAttribute
+                android:scaleX="0.7"
+                motion:framePosition="40"
+                motion:motionTarget="@+id/appLogo" />
+            <KeyAttribute
+                android:scaleY="0.7"
+                motion:framePosition="40"
+                motion:motionTarget="@+id/appLogo" />
+            <KeyAttribute
+                android:scaleX="200"
+                motion:framePosition="100"
+                motion:motionTarget="@+id/appLogo" />
+            <KeyAttribute
+                android:scaleY="200"
+                motion:framePosition="100"
+                motion:motionTarget="@+id/appLogo" />
+            <KeyAttribute
+                android:alpha="1"
+                motion:framePosition="80"
+                motion:motionTarget="@+id/appLogo" />
+            <KeyAttribute
+                android:alpha="1"
+                motion:framePosition="100"
+                motion:motionTarget="@+id/appLogo" />
+            <KeyAttribute
+                android:alpha="0.5"
+                motion:framePosition="75"
+                motion:motionTarget="@+id/groupLogo" />
+            <KeyAttribute
+                android:alpha="0"
+                motion:framePosition="80"
+                motion:motionTarget="@+id/groupLogo" />
+            <KeyAttribute
+                android:alpha="0"
+                motion:framePosition="100"
+                motion:motionTarget="@+id/groupLogo" />
+            <KeyAttribute
+                android:alpha="1"
+                motion:framePosition="58"
+                motion:motionTarget="@+id/textView" />
+            <KeyAttribute
+                android:alpha="0"
+                motion:framePosition="79"
+                motion:motionTarget="@+id/textView" />
+            <KeyAttribute
+                android:alpha="0"
+                motion:framePosition="100"
+                motion:motionTarget="@+id/textView" />
+            <KeyTrigger
+                motion:framePosition="75"
+                motion:motionTarget="@+id/appLogo"
+                motion:onCross="method" />
+        </KeyFrameSet>
+    </Transition>
+</MotionScene>

@@ -31,6 +31,12 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="BadasTheme.Splash" parent="BadasTheme.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:statusBarColor">#00ffffff</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
     <style name="BadasTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.ActionBar" />
 
     <style name="BadasTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents" />

@@ -14,8 +14,6 @@ public class LevelSelectionFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_level_selection, container, false);
-
-
         return view;
     }
 }

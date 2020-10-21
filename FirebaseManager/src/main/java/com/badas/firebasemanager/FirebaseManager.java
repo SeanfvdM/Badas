@@ -13,6 +13,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.FirebaseDatabase;
@@ -53,25 +54,43 @@ public class FirebaseManager {
         void CompleteLink(Task<AuthResult> task);
     }
 
-    public class Authentication {
+    static void checkInstance() {
+        if (instance == null)
+            throw new NullPointerException("FirebaseManager needs to be initialised");
+    }
+
+    public static class Authentication {
+        public Authentication() {
+            checkInstance();
+        }
+
+        public FirebaseUser CheckForUser() {
+            return instance.firebaseAuth.getCurrentUser();
+        }
+
         public Task<AuthResult> EmailPassLogin(String email, String pass) {
-            return firebaseAuth.signInWithEmailAndPassword(email, pass);
+            checkInstance();
+            return instance.firebaseAuth.signInWithEmailAndPassword(email, pass);
         }
 
         public Task<AuthResult> EmailPassRegister(String email, String pass) {
-            return firebaseAuth.createUserWithEmailAndPassword(email, pass);
+            checkInstance();
+            return instance.firebaseAuth.createUserWithEmailAndPassword(email, pass);
         }
 
         public Task<AuthResult> CredentialLogin(AuthCredential credential) {
-            return firebaseAuth.signInWithCredential(credential);
+            checkInstance();
+            return instance.firebaseAuth.signInWithCredential(credential);
         }
 
         public Task<AuthResult> CredentialRegister(AuthCredential credential) {
-            return firebaseAuth.signInWithCredential(credential);
+            checkInstance();
+            return instance.firebaseAuth.signInWithCredential(credential);
         }
 
         public Task<AuthResult> LinkCredentials(AuthCredential credential) {
-            return firebaseAuth.getCurrentUser().linkWithCredential(credential);
+            checkInstance();
+            return instance.firebaseAuth.getCurrentUser().linkWithCredential(credential);
         }
 
         public class PhoneAuthentication {
