@@ -11,6 +11,8 @@
     <color name="colorError">#B82742</color>
     <color name="colorOnError">#ffffff</color>
 
+    <color name="colorGreen">#08E664</color>
+
     <color name="colorAccent">#f27e21</color>
     <color name="colorOnAccent">#000000</color>
     <color name="colorPrimary">#2196f3</color>
