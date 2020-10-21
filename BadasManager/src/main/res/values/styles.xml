@@ -19,7 +19,11 @@
         <item name="navigationViewStyle">@style/BadasTheme.NavigationView</item>
         <item name="appBarLayoutStyle">@style/BadasTheme.AppBarOverlay</item>
         <item name="floatingActionButtonStyle">@style/BadasTheme.FloatingActionButton</item>
-        <item name="extendedFloatingActionButtonStyle">@style/BadasTheme.ExtendedFloatingActionButton.Icon</item>
+        <item name="extendedFloatingActionButtonStyle">
+            @style/BadasTheme.ExtendedFloatingActionButton.Icon
+        </item>
+        <item name="materialCardViewStyle">@style/BadasTheme.CardView</item>
+        <item name="materialButtonStyle">@style/BadasTheme.Button</item>
     </style>
 
     <style name="BadasTheme.NoActionBar">
@@ -171,6 +175,8 @@
     <style name="BadasTheme.Button" parent="Widget.MaterialComponents.Button.UnelevatedButton"></style>
 
     <style name="BadasTheme.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton"></style>
+
+    <style name="BadasTheme.Button.OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton"></style>
 
     <style name="BadasTheme.Button.ErrorTextButton" parent="BadasTheme.Button.TextButton">
         <item name="android:textColor">@color/colorError</item>

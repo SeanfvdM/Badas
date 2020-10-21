@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="legible_small">Small text might not be legible</string>
+    <string name="legible_large">Large text might not be legible with long sentences</string>
+</resources>
