@@ -64,6 +64,10 @@ public class FirebaseManager {
             checkInstance();
         }
 
+        public void SignOut() {
+            instance.firebaseAuth.signOut();
+        }
+
         public FirebaseUser CheckForUser() {
             return instance.firebaseAuth.getCurrentUser();
         }

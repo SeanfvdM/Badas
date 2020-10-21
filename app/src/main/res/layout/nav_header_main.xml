@@ -9,7 +9,7 @@
     android:theme="@style/ThemeOverlay.MaterialComponents.Light">
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/imageView"
+        android:id="@+id/iv_AppLogo"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginTop="8dp"
@@ -28,8 +28,8 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:background="@color/colorSurface"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView"
-        app:layout_constraintEnd_toEndOf="@+id/imageView"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_AppLogo"
+        app:layout_constraintEnd_toEndOf="@+id/iv_AppLogo"
         app:shapeAppearance="@style/ShapeAppearance.BadasTheme.ProfileType" />
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -41,6 +41,7 @@
         app:layout_constraintStart_toStartOf="@+id/shapeableImageView"
         app:layout_constraintTop_toTopOf="@+id/shapeableImageView"
         app:shapeAppearance="@style/ShapeAppearance.BadasTheme.ProfileType"
+        android:tint="@color/colorOnSurface"
         app:srcCompat="@drawable/ic_gaurdian" />
 
     <TextView
@@ -52,9 +53,10 @@
         android:ellipsize="end"
         android:singleLine="true"
         android:text="User name"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView"
-        app:layout_constraintEnd_toStartOf="@+id/imageView"
+        android:textAppearance="@style/TextAppearance.BadasTheme.Body1"
+        android:textColor="@color/colorOnSurface"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_AppLogo"
+        app:layout_constraintEnd_toStartOf="@+id/iv_AppLogo"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="@tools:sample/full_names" />
 

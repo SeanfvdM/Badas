@@ -183,11 +183,15 @@ public class FontBottomDialogFragment extends BottomSheetDialogFragment {
                                 view.findViewById(R.id.til_fontSearch).setEnabled(true);
                                 fontSearch.requestFocus();
                                 //https://stackoverflow.com/a/7291048
-                                InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                                if (imm != null) {
-                                    imm.showSoftInput(fontSearch, InputMethodManager.SHOW_IMPLICIT);
+                                try {
+                                    InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                    if (imm != null) {
+                                        imm.showSoftInput(fontSearch, InputMethodManager.SHOW_IMPLICIT);
+                                    }
+                                    fontSearch.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, Font.getFontFamilies(fontList)));
+                                } catch (IllegalStateException ignored) {
+
                                 }
-                                fontSearch.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, Font.getFontFamilies(fontList)));
                             }
 
                             @Override

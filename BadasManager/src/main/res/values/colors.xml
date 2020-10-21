@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorBackground">#fafafa</color>
+    <color name="colorOnBackground">#000000</color>
     <color name="colorSurface">#ffffff</color>
     <color name="colorOnSurface">#000000</color>
     <color name="colorOnSurfaceLight">#80000000</color>

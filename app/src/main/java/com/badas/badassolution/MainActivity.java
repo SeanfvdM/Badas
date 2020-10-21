@@ -38,8 +38,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(ContextCompat.getDrawable(this, R.drawable.menu));
         setSupportActionBar(toolbar);
+
         final NavigationView navigationView = findViewById(R.id.nav_view);
 
         DynamicMenu.getInstance().add(

@@ -11,7 +11,8 @@ import com.badas.firebasemanager.FirebaseManager;
 import com.badas.login.LoginActivity;
 
 public class SplashScreen extends AppCompatActivity {
-    boolean skip_login = false;
+    static int overrideFirebase = 1; //will clear active firebase user - set to 0 to not override and 1 to override
+    boolean skip_login = false; //use to skip the login screen
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +27,12 @@ public class SplashScreen extends AppCompatActivity {
         //todo do logic here
         FirebaseManager.getInstance(this);
         FirebaseManager.Authentication authentication = new FirebaseManager.Authentication();
+        if (overrideFirebase == 1) {
+            authentication.SignOut();
+            overrideFirebase++;
+        }
+
+
         if (authentication.CheckForUser() == null && !skip_login)
             Start(LoginActivity.class);
         else
@@ -47,6 +54,8 @@ public class SplashScreen extends AppCompatActivity {
             @Override
             public void onTransitionCompleted(MotionLayout motionLayout, int value) {
                 Intent intent = new Intent(SplashScreen.this, cls);
+                if (cls == LoginActivity.class)
+                    LoginActivity.setFrom(SplashScreen.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
