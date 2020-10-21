@@ -1,3 +1,11 @@
-<manifest
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.badas.login">
+
+    <application>
+        <activity
+            android:name=".LoginActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/BadasTheme.NoActionBar" />
+    </application>
+
 </manifest>

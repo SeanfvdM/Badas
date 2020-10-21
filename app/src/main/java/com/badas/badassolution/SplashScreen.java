@@ -8,18 +8,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 
 import com.badas.firebasemanager.FirebaseManager;
+import com.badas.login.LoginActivity;
 
 public class SplashScreen extends AppCompatActivity {
-    boolean override_firebase = true;
+    boolean skip_login = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
         ((MotionLayout) findViewById(R.id.motionLayout)).transitionToStart();
-        if (override_firebase) {
-            Start(MainActivity.class);
-        }
     }
 
     @Override
@@ -28,11 +26,10 @@ public class SplashScreen extends AppCompatActivity {
         //todo do logic here
         FirebaseManager.getInstance(this);
         FirebaseManager.Authentication authentication = new FirebaseManager.Authentication();
-        if (authentication.CheckForUser() == null)
-            Start(MainActivity.class); //todo goto login
+        if (authentication.CheckForUser() == null && !skip_login)
+            Start(LoginActivity.class);
         else
             Start(MainActivity.class);
-        return;
     }
 
     private void Start(final Class<?> cls) {
@@ -59,7 +56,7 @@ public class SplashScreen extends AppCompatActivity {
             public void onTransitionTrigger(MotionLayout motionLayout, int i, boolean b, float v) {
             }
         });
-        final long waitDur = 100;
+        final long waitDur = 500;
         CountDownTimer countDownTimer = new CountDownTimer(waitDur, 1) {
             @Override
             public void onTick(long millisUntilFinished) {
