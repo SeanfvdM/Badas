@@ -12,11 +12,11 @@
         android:id="@+id/appLogo"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:contentDescription="@string/application_icon"
         android:transitionName="appLogo"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_app_icon" />
 
@@ -24,12 +24,12 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="@string/login_title"
+        android:layout_marginEnd="8dp"
+        android:text="Register"
         android:textAppearance="@style/TextAppearance.BadasTheme.Headline4"
         android:transitionName="title"
         app:layout_constraintBottom_toBottomOf="@+id/appLogo"
-        app:layout_constraintStart_toEndOf="@+id/appLogo"
+        app:layout_constraintEnd_toStartOf="@+id/appLogo"
         app:layout_constraintTop_toTopOf="@+id/appLogo" />
 
     <com.google.android.material.textfield.TextInputLayout
@@ -74,8 +74,32 @@
             android:id="@+id/tiet_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autofillHints="password"
+            android:autofillHints="newPassword"
             android:hint="@string/password"
+            android:importantForAutofill="yes"
+            android:inputType="textPassword"
+            android:singleLine="true" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout2"
+        app:passwordToggleEnabled="true"
+        app:startIconDrawable="@drawable/ic_baseline_lock_24">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/tiet_rePassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="newPassword"
+            android:hint="Re-enter Password"
             android:importantForAutofill="yes"
             android:inputType="textPassword"
             android:singleLine="true" />
@@ -94,45 +118,26 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/login"
+        android:text="Create account"
         android:transitionName="confirmButton"
-        app:layout_constraintEnd_toEndOf="@+id/textInputLayout2"
-        app:layout_constraintStart_toStartOf="@+id/textInputLayout2"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
+        app:layout_constraintEnd_toEndOf="@+id/textInputLayout3"
+        app:layout_constraintStart_toStartOf="@+id/textInputLayout3"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout3" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_register"
+        android:id="@+id/btn_navigate"
         style="@style/BadasTheme.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="@string/create_an_account"
+        android:text="Back to login"
         android:transitionName="navigateButton"
-        app:icon="@drawable/ic_person_add"
+        app:icon="@drawable/ic_person"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_phoneLogin"
-        style="@style/BadasTheme.Button.TextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/phone_number_login"
-        android:visibility="gone"
-        app:icon="@drawable/ic_baseline_phone_24"
-        app:layout_constraintBottom_toTopOf="@+id/btn_register"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_resetPass"
-        app:layout_constraintVertical_bias="1.0"
-        tools:visibility="visible" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline3"
@@ -142,16 +147,17 @@
         app:layout_constraintGuide_percent="0.5" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_resetPass"
-        style="@style/BadasTheme.Button.ErrorTextButton"
+        android:id="@+id/btn_addChild"
+        style="@style/BadasTheme.Button.OutlinedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:transitionName="extraButton"
         android:layout_marginTop="8dp"
         android:minHeight="32dip"
-        android:text="@string/forgot_password"
+        android:text="Add Child Account"
+        android:transitionName="extraButton"
+        app:icon="@drawable/ic_outline_group_add_24"
         app:layout_constraintEnd_toEndOf="@+id/btn_login"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/btn_login"
         app:layout_constraintTop_toBottomOf="@+id/btn_login" />
 

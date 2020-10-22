@@ -12,12 +12,10 @@
         <activity
             android:name=".SplashScreen"
             android:launchMode="singleTask"
-            android:noHistory="true"
             android:theme="@style/BadasTheme.Splash">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
         <activity

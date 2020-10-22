@@ -6,6 +6,7 @@ import android.os.CountDownTimer;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.motion.widget.MotionLayout;
+import androidx.core.app.ActivityOptionsCompat;
 
 import com.badas.firebasemanager.FirebaseManager;
 import com.badas.login.LoginActivity;
@@ -56,8 +57,11 @@ public class SplashScreen extends AppCompatActivity {
                 Intent intent = new Intent(SplashScreen.this, cls);
                 if (cls == LoginActivity.class)
                     LoginActivity.setFrom(SplashScreen.class);
+
+                ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat
+                        .makeSceneTransitionAnimation(SplashScreen.this, findViewById(R.id.appLogo), "appLogo");
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+                startActivity(intent, activityOptionsCompat.toBundle());
                 finish();
             }
 

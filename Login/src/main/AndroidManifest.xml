@@ -6,6 +6,10 @@
             android:name=".LoginActivity"
             android:launchMode="singleTask"
             android:theme="@style/BadasTheme.NoActionBar" />
+        <activity
+            android:name=".RegisterActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/BadasTheme.NoActionBar" />
     </application>
 
 </manifest>

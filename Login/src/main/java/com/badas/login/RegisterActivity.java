@@ -8,7 +8,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityOptionsCompat;
-import androidx.core.util.Pair;
 
 import com.badas.firebasemanager.FirebaseManager;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -17,7 +16,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 
-public class LoginActivity extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity {
 
     //    Button btnLogin, btnSignInWithGoogle;
 //    EditText edtPassword, edtEmail;
@@ -30,7 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     FirebaseManager.Authentication authentication;
 
     public static void setFrom(Class<?> from) {
-        LoginActivity.from = from;
+        RegisterActivity.from = from;
     }
 
     @Override
@@ -43,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_register);
 
         btn_login = findViewById(R.id.btn_login);
         tiet_email = findViewById(R.id.tiet_email);
@@ -59,34 +58,24 @@ public class LoginActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
-                                    Intent intent = new Intent(LoginActivity.this, from);
+                                    Intent intent = new Intent(RegisterActivity.this, from);
                                     ActivityOptionsCompat activityOptionsCompat =
-                                            ActivityOptionsCompat.makeSceneTransitionAnimation(LoginActivity.this, findViewById(R.id.appLogo), "appLogo");
+                                            ActivityOptionsCompat.makeSceneTransitionAnimation(RegisterActivity.this, findViewById(R.id.appLogo), "appLogo");
                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     startActivity(intent, activityOptionsCompat.toBundle());
                                     finish();
                                 } else {
-                                    Toast.makeText(LoginActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(RegisterActivity.this, "Failed", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
             }
         });
 
-        findViewById(R.id.btn_register).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_navigate).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-                ActivityOptionsCompat activityOptionsCompat =
-                        ActivityOptionsCompat.makeSceneTransitionAnimation(LoginActivity.this,
-                                Pair.create(findViewById(R.id.appLogo), "appLogo"),
-                                Pair.create(findViewById(R.id.textInputLayout), "emailContainer"),
-                                Pair.create(findViewById(R.id.textInputLayout2), "passwordContainer"),
-                                Pair.create(findViewById(R.id.btn_login), "confirmButton"),
-                                Pair.create(findViewById(R.id.btn_register), "navigateButton"),
-                                Pair.create(findViewById(R.id.title), "title"),
-                                Pair.create(findViewById(R.id.btn_resetPass), "extraButton"));
-                startActivity(intent, activityOptionsCompat.toBundle());
+                RegisterActivity.super.onBackPressed();
             }
         });
 
