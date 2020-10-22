@@ -168,7 +168,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 if (tiet_password.getText().length() >= 6) {
                     ((TextInputLayout) findViewById(R.id.textInputLayout2)).setStartIconDrawable(
-                            ResourcesCompat.getDrawable(getResources(), R.drawable.ic_outline_lock_24_white, getTheme()));
+                            ResourcesCompat.getDrawable(getResources(), R.drawable.ic_outline_check_24, getTheme()));
                     valid[1] = true;
                 } else {
                     ((TextInputLayout) findViewById(R.id.textInputLayout2)).setStartIconDrawable(
