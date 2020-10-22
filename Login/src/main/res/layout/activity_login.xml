@@ -56,7 +56,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
         app:passwordToggleEnabled="true"
-        app:startIconDrawable="@drawable/ic_baseline_lock_24">
+        app:startIconDrawable="@drawable/ic_outline_lock_open_24">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/tiet_password"
@@ -82,6 +82,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:enabled="false"
         android:text="@string/login"
         android:transitionName="confirmButton"
         app:layout_constraintEnd_toEndOf="@+id/textInputLayout2"
@@ -136,6 +137,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:ellipsize="middle"
+        android:enabled="false"
         android:minHeight="32dip"
         android:text="@string/forgot_password"
         android:transitionName="extraButton"

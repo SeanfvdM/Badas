@@ -3,12 +3,16 @@ package com.badas.login;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.core.util.Pair;
 
 import com.badas.firebasemanager.FirebaseManager;
@@ -17,15 +21,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 
-public class LoginActivity extends AppCompatActivity {
+import java.util.Objects;
 
-    //    Button btnLogin, btnSignInWithGoogle;
-//    EditText edtPassword, edtEmail;
-//    TextView btnRegister;
-//    ProgressBar progressbarLogin;
-//    private FirebaseAuth mAuth;
+public class LoginActivity extends AppCompatActivity {
     private static Class<?> from;
     MaterialButton btn_login;
     TextInputEditText tiet_email, tiet_password;
@@ -52,12 +53,14 @@ public class LoginActivity extends AppCompatActivity {
         tiet_email = findViewById(R.id.tiet_email);
         tiet_password = findViewById(R.id.tiet_password);
 
+        FirebaseManager.getInstance(this);
         authentication = new FirebaseManager.Authentication();
 
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //todo do validation checks
+                //tiet_email.setError("error"); //use this method to display input errors
                 authentication.EmailPassLogin(tiet_email.getText().toString(), tiet_password.getText().toString())
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
@@ -81,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-                ActivityOptionsCompat activityOptionsCompat =
+                @SuppressWarnings("unchecked") ActivityOptionsCompat activityOptionsCompat =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(LoginActivity.this,
                                 Pair.create(findViewById(R.id.appLogo), "appLogo"),
                                 Pair.create(findViewById(R.id.textInputLayout), "emailContainer"),
@@ -97,6 +100,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //todo check that email field is filled
+//                tiet_email.setError("error"); //use this method to display input errors
                 authentication.ResetPasswordEmail(tiet_email.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -136,101 +140,49 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        //  mAuth = FirebaseAuth.getInstance();
+        final boolean[] valid = new boolean[]{false, false};
 
-//        btnRegister = findViewById(R.id.btnRegister);
-//        btnSignInWithGoogle = findViewById(R.id.btnSignInWithGoogle);
-//        btnLogin = findViewById(R.id.btnLogin);
-//        edtEmail = findViewById(R.id.edtEmailLogin);
-//        edtPassword = findViewById(R.id.edtPasswordLogin);
-//        progressbarLogin = findViewById(R.id.progressBarLogin);
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//                .requestIdToken(getString(/*token*/))
-//                .requestEmail()
-//                .build();
+            }
 
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-//        btnLogin.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String email = edtEmail.getText().toString().trim();
-//                String password = edtPassword.getText().toString().trim();
-//
-//                if (TextUtils.isEmpty(email)) {
-//                    edtEmail.setError("Email is required.");
-//                    return;
-//                }
-//                if (TextUtils.isEmpty(password)) {
-//                    edtPassword.setError("Password is required.");
-//                    return;
-//                }
-//
-//                if (password.length() < 6) {
-//                    edtPassword.setError("Password must be longer than 6 characters.");
-//                    return;
-//                }
-//
-//                progressbarLogin.setVisibility(View.VISIBLE);
-//
-//                //authenticate user
-//
-////                mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-////                    @Override
-////                    public void onComplete(@NonNull Task<AuthResult> task) {
-////                        if (task.isSuccessful()) {
-////                            Toast.makeText(LoginActivity.this, "User Logged in Successfully", Toast.LENGTH_SHORT).show();
-////                            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-////                            finish();
-////                        } else {
-////                            Toast.makeText(LoginActivity.this, "Error!" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-////                            progressbarLogin.setVisibility(View.GONE);
-////                        }
-////                    }
-////                });
-//            }
-//        });
-//
-//        btnRegister.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                //    startActivity(new Intent(getApplicationContext(), Register.class));
-//                //todo to go to the registration page
-//                finish();
-//            }
-//        });
-//
-//
-//        btnSignInWithGoogle.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-////                private void firebaseAuthWithGoogle(String idToken) {
-////                    AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-////                    mAuth.signInWithCredential(credential)
-////                            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-////                                @Override
-////                                public void onComplete(@NonNull Task<AuthResult> task) {
-////                                    if (task.isSuccessful()) {
-////                                        // Sign in success, update UI with the signed-in user's information
-////                                        Log.d(TAG, "signInWithCredential:success");
-////                                        FirebaseUser user = mAuth.getCurrentUser();
-////                                        updateUI(user);
-////                                    } else {
-////                                        // If sign in fails, display a message to the user.
-////                                        Log.w(TAG, "signInWithCredential:failure", task.getException());
-////                                        Snackbar.make(mBinding.mainLayout, "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
-////                                        updateUI(null);
-////                                    }
-////
-////                                    // ...
-////                                }
-////                            });
-////                }
-//            }
-//        });
+            }
 
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (Patterns.EMAIL_ADDRESS.matcher(
+                        Objects.requireNonNull(tiet_email.getText())).matches()) {
+                    ((TextInputLayout) findViewById(R.id.textInputLayout)).setStartIconDrawable(
+                            ResourcesCompat.getDrawable(getResources(), R.drawable.ic_outline_check_24, getTheme()));
+                    valid[0] = true;
+                } else {
+                    ((TextInputLayout) findViewById(R.id.textInputLayout)).setStartIconDrawable(
+                            ResourcesCompat.getDrawable(getResources(), R.drawable.ic_baseline_alternate_email_24, getTheme()));
+                    valid[0] = false;
+                }
 
+                if (tiet_password.getText().length() >= 6) {
+                    ((TextInputLayout) findViewById(R.id.textInputLayout2)).setStartIconDrawable(
+                            ResourcesCompat.getDrawable(getResources(), R.drawable.ic_outline_lock_24_white, getTheme()));
+                    valid[1] = true;
+                } else {
+                    ((TextInputLayout) findViewById(R.id.textInputLayout2)).setStartIconDrawable(
+                            ResourcesCompat.getDrawable(getResources(), R.drawable.ic_outline_lock_open_24, getTheme()));
+                    valid[1] = false;
+                }
+
+                btn_login.setEnabled(valid[0] && valid[1]);
+                findViewById(R.id.btn_resetPass).setEnabled(valid[0]);
+            }
+        };
+
+        tiet_email.addTextChangedListener(textWatcher);
+        tiet_password.addTextChangedListener(textWatcher);
     }
 
 }

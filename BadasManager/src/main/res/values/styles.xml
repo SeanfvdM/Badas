@@ -194,7 +194,7 @@
     <style name="BadasTheme.Button.OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton"></style>
 
     <style name="BadasTheme.Button.ErrorTextButton" parent="BadasTheme.Button.TextButton">
-        <item name="android:textColor">@color/colorError</item>
+        <item name="android:textColor">@drawable/textbutton_color_error</item>
         <item name="rippleColor">@color/colorError</item>
     </style>
 

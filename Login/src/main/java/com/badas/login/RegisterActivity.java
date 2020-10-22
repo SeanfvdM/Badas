@@ -2,30 +2,35 @@ package com.badas.login;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.util.Patterns;
 import android.view.View;
+import android.view.autofill.AutofillManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.badas.firebasemanager.FirebaseManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
+
+import java.util.Objects;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    //    Button btnLogin, btnSignInWithGoogle;
-//    EditText edtPassword, edtEmail;
-//    TextView btnRegister;
-//    ProgressBar progressbarLogin;
-//    private FirebaseAuth mAuth;
     private static Class<?> from;
-    MaterialButton btn_login;
-    TextInputEditText tiet_email, tiet_password;
+    MaterialButton btn_login, btn_addChild;
+    TextInputEditText tiet_email, tiet_password, tiet_rePassword;
     FirebaseManager.Authentication authentication;
 
     public static void setFrom(Class<?> from) {
@@ -36,7 +41,10 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         tiet_email.requestFocus();
-
+        AutofillManager afm = this.getSystemService(AutofillManager.class);
+        if (afm != null) {
+            afm.requestAutofill(tiet_email);
+        }
     }
 
     @Override
@@ -45,14 +53,18 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         btn_login = findViewById(R.id.btn_login);
+        btn_addChild = findViewById(R.id.btn_addChild);
         tiet_email = findViewById(R.id.tiet_email);
         tiet_password = findViewById(R.id.tiet_password);
+        tiet_rePassword = findViewById(R.id.tiet_rePassword);
 
         authentication = new FirebaseManager.Authentication();
 
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //todo do validation checks
+                //tiet_email.setError("error"); //use this method to display input errors
                 authentication.EmailPassRegister(tiet_email.getText().toString(), tiet_password.getText().toString())
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
@@ -86,101 +98,107 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        //  mAuth = FirebaseAuth.getInstance();
+        final boolean[] valid = new boolean[]{false, false, false};
 
-//        btnRegister = findViewById(R.id.btnRegister);
-//        btnSignInWithGoogle = findViewById(R.id.btnSignInWithGoogle);
-//        btnLogin = findViewById(R.id.btnLogin);
-//        edtEmail = findViewById(R.id.edtEmailLogin);
-//        edtPassword = findViewById(R.id.edtPasswordLogin);
-//        progressbarLogin = findViewById(R.id.progressBarLogin);
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//                .requestIdToken(getString(/*token*/))
-//                .requestEmail()
-//                .build();
+            }
 
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-//        btnLogin.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String email = edtEmail.getText().toString().trim();
-//                String password = edtPassword.getText().toString().trim();
-//
-//                if (TextUtils.isEmpty(email)) {
-//                    edtEmail.setError("Email is required.");
-//                    return;
-//                }
-//                if (TextUtils.isEmpty(password)) {
-//                    edtPassword.setError("Password is required.");
-//                    return;
-//                }
-//
-//                if (password.length() < 6) {
-//                    edtPassword.setError("Password must be longer than 6 characters.");
-//                    return;
-//                }
-//
-//                progressbarLogin.setVisibility(View.VISIBLE);
-//
-//                //authenticate user
-//
-////                mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-////                    @Override
-////                    public void onComplete(@NonNull Task<AuthResult> task) {
-////                        if (task.isSuccessful()) {
-////                            Toast.makeText(LoginActivity.this, "User Logged in Successfully", Toast.LENGTH_SHORT).show();
-////                            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-////                            finish();
-////                        } else {
-////                            Toast.makeText(LoginActivity.this, "Error!" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-////                            progressbarLogin.setVisibility(View.GONE);
-////                        }
-////                    }
-////                });
-//            }
-//        });
-//
-//        btnRegister.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                //    startActivity(new Intent(getApplicationContext(), Register.class));
-//                //todo to go to the registration page
-//                finish();
-//            }
-//        });
-//
-//
-//        btnSignInWithGoogle.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-////                private void firebaseAuthWithGoogle(String idToken) {
-////                    AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-////                    mAuth.signInWithCredential(credential)
-////                            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-////                                @Override
-////                                public void onComplete(@NonNull Task<AuthResult> task) {
-////                                    if (task.isSuccessful()) {
-////                                        // Sign in success, update UI with the signed-in user's information
-////                                        Log.d(TAG, "signInWithCredential:success");
-////                                        FirebaseUser user = mAuth.getCurrentUser();
-////                                        updateUI(user);
-////                                    } else {
-////                                        // If sign in fails, display a message to the user.
-////                                        Log.w(TAG, "signInWithCredential:failure", task.getException());
-////                                        Snackbar.make(mBinding.mainLayout, "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
-////                                        updateUI(null);
-////                                    }
-////
-////                                    // ...
-////                                }
-////                            });
-////                }
-//            }
-//        });
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (Patterns.EMAIL_ADDRESS.matcher(
+                        Objects.requireNonNull(tiet_email.getText())).matches()) {
+                    //does an ui update for the email field - no animation
+                    ((TextInputLayout) findViewById(R.id.textInputLayout)).setStartIconDrawable(
+                            ResourcesCompat.getDrawable(getResources(), R.drawable.ic_outline_check_24, getTheme()));
+                    valid[0] = true;
+                } else {
+                    //does an ui update for the email field - no animation
+                    ((TextInputLayout) findViewById(R.id.textInputLayout)).setStartIconDrawable(
+                            ResourcesCompat.getDrawable(getResources(), R.drawable.ic_baseline_alternate_email_24, getTheme()));
+                    valid[0] = false;
+                }
+
+                //todo optionally reset error messages for passwords
+
+                //checks if the passwords are at the desired length
+                if (Objects.requireNonNull(tiet_password.getText()).length() >= 6
+                        && Objects.requireNonNull(tiet_rePassword.getText()).length() >= 6) {
+                    //checks if the passwords match
+                    if (TextUtils.equals(
+                            Objects.requireNonNull(tiet_password.getText()).toString(),
+                            Objects.requireNonNull(tiet_rePassword.getText()).toString())) {
+                        //makes a ui update to show that the passwords are valid - no animation
+                        ((TextInputLayout) findViewById(R.id.textInputLayout2)).setStartIconDrawable(
+                                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_outline_check_24, getTheme()));
+                        ((TextInputLayout) findViewById(R.id.textInputLayout3)).setStartIconDrawable(
+                                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_outline_check_24, getTheme()));
+                        valid[1] = true;
+                        valid[2] = true;
+                    } else {
+                        //todo display error message of mismatching passwords
+                        //makes a ui update to show that the passwords are invalid - no animation
+                        ((TextInputLayout) findViewById(R.id.textInputLayout2)).setStartIconDrawable(
+                                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_close, getTheme()));
+                        ((TextInputLayout) findViewById(R.id.textInputLayout3)).setStartIconDrawable(
+                                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_close, getTheme()));
+                        valid[1] = false;
+                        valid[2] = false;
+                    }
+                } else {
+                    //checks if the password fields length is at the desired length
+                    if (Objects.requireNonNull(tiet_password.getText()).length() >= 6) {
+                        //resets the ui of the other password field if it's length is less
+                        // than the desired length
+                        ((TextInputLayout) findViewById(R.id.textInputLayout3)).setStartIconDrawable(
+                                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_outline_lock_open_24, getTheme()));
+                        ((TextInputLayout) findViewById(R.id.textInputLayout2)).setStartIconDrawable(
+                                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_outline_lock_24_white, getTheme()));
+                        valid[1] = true;
+                        valid[2] = false;
+                    }
+
+                    //checks if the password fields length is at the desired length
+                    if (Objects.requireNonNull(tiet_rePassword.getText()).length() >= 6) {
+                        //resets the ui of the other password field if it's length is less
+                        // than the desired length
+                        ((TextInputLayout) findViewById(R.id.textInputLayout2)).setStartIconDrawable(
+                                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_outline_lock_open_24, getTheme()));
+                        ((TextInputLayout) findViewById(R.id.textInputLayout3)).setStartIconDrawable(
+                                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_outline_lock_24_white, getTheme()));
+                        valid[1] = false;
+                        valid[2] = true;
+                    }
+                }
+
+                btn_login.setEnabled(valid[0] && valid[1] && valid[2]);
+            }
+        };
+
+        tiet_email.addTextChangedListener(textWatcher);
+        tiet_password.addTextChangedListener(textWatcher);
+        tiet_rePassword.addTextChangedListener(textWatcher);
 
 
+        ((MaterialButtonToggleGroup) findViewById(R.id.tb_userType)).addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
+            @Override
+            public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
+                //add event that happens when user type is selected
+                if (checkedId == R.id.btn_parent && isChecked) {
+                    btn_addChild.setEnabled(true);
+                } else //generic user - can be child
+                    if (checkedId == R.id.btn_gaurdian && isChecked) {
+                        btn_addChild.setEnabled(true);
+                    } else btn_addChild.setEnabled(checkedId == R.id.btn_teacher && isChecked);
+            }
+        });
     }
 
 }

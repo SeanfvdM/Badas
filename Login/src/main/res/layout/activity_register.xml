@@ -57,7 +57,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
         app:passwordToggleEnabled="true"
-        app:startIconDrawable="@drawable/ic_baseline_lock_24">
+        app:startIconDrawable="@drawable/ic_outline_lock_open_24">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/tiet_password"
@@ -81,7 +81,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout2"
         app:passwordToggleEnabled="true"
-        app:startIconDrawable="@drawable/ic_baseline_lock_24">
+        app:startIconDrawable="@drawable/ic_outline_lock_open_24">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/tiet_rePassword"
@@ -107,11 +107,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:enabled="false"
         android:text="Create account"
         android:transitionName="confirmButton"
         app:layout_constraintEnd_toEndOf="@+id/textInputLayout3"
         app:layout_constraintStart_toStartOf="@+id/textInputLayout3"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout3" />
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_navigate"
@@ -137,11 +138,12 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_addChild"
-        style="@style/BadasTheme.Button.OutlinedButton"
+        style="@style/BadasTheme.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:ellipsize="middle"
+        android:enabled="false"
         android:minHeight="32dip"
         android:text="Add Child Account"
         android:transitionName="extraButton"
@@ -163,5 +165,63 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_app_icon" />
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/tb_userType"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="@+id/textInputLayout3"
+        app:layout_constraintStart_toStartOf="@+id/textInputLayout3"
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        app:singleSelection="true">
+
+        <Button
+            android:id="@+id/btn_parent"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Parent" />
+
+        <Button
+            android:id="@+id/btn_gaurdian"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Gaurdian" />
+
+        <Button
+            android:id="@+id/btn_teacher"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Teacher" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="I am a"
+        android:textAppearance="@style/TextAppearance.BadasTheme.Subtitle1"
+        app:layout_constraintStart_toStartOf="@+id/tb_userType"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout3" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="*If not applicable do not select an option*"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textColor="@color/colorOnSurfaceLight"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/tb_userType"
+        app:layout_constraintStart_toStartOf="@+id/tb_userType"
+        app:layout_constraintTop_toBottomOf="@+id/tb_userType" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
