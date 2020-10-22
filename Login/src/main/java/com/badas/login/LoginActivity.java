@@ -2,6 +2,7 @@ package com.badas.login;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.Toast;
 
@@ -14,6 +15,7 @@ import com.badas.firebasemanager.FirebaseManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 
@@ -28,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
     MaterialButton btn_login;
     TextInputEditText tiet_email, tiet_password;
     FirebaseManager.Authentication authentication;
+    Snackbar snackbar;
 
     public static void setFrom(Class<?> from) {
         LoginActivity.from = from;
@@ -54,6 +57,7 @@ public class LoginActivity extends AppCompatActivity {
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //todo do validation checks
                 authentication.EmailPassLogin(tiet_email.getText().toString(), tiet_password.getText().toString())
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
@@ -87,6 +91,48 @@ public class LoginActivity extends AppCompatActivity {
                                 Pair.create(findViewById(R.id.title), "title"),
                                 Pair.create(findViewById(R.id.btn_resetPass), "extraButton"));
                 startActivity(intent, activityOptionsCompat.toBundle());
+            }
+        });
+        findViewById(R.id.btn_resetPass).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //todo check that email field is filled
+                authentication.ResetPasswordEmail(tiet_email.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            snackbar = Snackbar.make(findViewById(R.id.btn_resetPass), "Email was sent", Snackbar.LENGTH_INDEFINITE);
+                            snackbar.setAction("Open Email", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if (snackbar.isShown()) {
+                                        snackbar.dismiss();
+                                    }
+                                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                                    intent.addCategory(Intent.CATEGORY_APP_EMAIL);
+                                    startActivity(intent);
+                                    startActivity(Intent.createChooser(intent, "Pick you preferred mailing app"));
+                                }
+                            });
+                            snackbar.show();
+                            CountDownTimer countDownTimer = new CountDownTimer(5000, 1) {
+                                @Override
+                                public void onTick(long millisUntilFinished) {
+
+                                }
+
+                                @Override
+                                public void onFinish() {
+                                    snackbar.dismiss();
+                                }
+                            };
+                            countDownTimer.start();
+                        } else {
+                            //todo display error
+                        }
+                    }
+                });
+
             }
         });
 

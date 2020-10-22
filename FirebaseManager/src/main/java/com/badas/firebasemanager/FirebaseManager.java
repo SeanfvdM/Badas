@@ -64,6 +64,10 @@ public class FirebaseManager {
             checkInstance();
         }
 
+        public Task<Void> ResetPasswordEmail(String email) {
+            return instance.firebaseAuth.sendPasswordResetEmail(email);
+        }
+
         public void SignOut() {
             instance.firebaseAuth.signOut();
         }

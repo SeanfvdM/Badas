@@ -12,8 +12,9 @@
 
         <item name="android:statusBarColor">?attr/colorSurface</item>
         <item name="android:windowLightStatusBar">@bool/isLight</item>
-        <item name="backgroundColor">@color/colorBackground</item>
-        <item name="android:windowBackground">@color/colorBackground</item>
+
+        <item name="backgroundColor">@color/colorSurface</item>
+        <item name="android:windowBackground">@color/colorSurface</item>
         <item name="colorSurface">@color/colorSurface</item>
         <item name="colorOnSurface">@color/colorOnSurface</item>
 
@@ -30,6 +31,7 @@
         </item>
         <item name="android:autofilledHighlight">@color/colorPrimarySelected</item>
         <item name="android:windowContentTransitions">true</item>
+
     </style>
 
     <style name="BadasTheme.NoActionBar">
@@ -40,7 +42,7 @@
     <style name="BadasTheme.Splash" parent="BadasTheme.NoActionBar">
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:statusBarColor">#00ffffff</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightStatusBar">@bool/isLight</item>
     </style>
 
     <style name="BadasTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.ActionBar" />
@@ -176,7 +178,7 @@
     <style name="BadasTheme.Spinner.DropDown" parent="BadasTheme">
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">18sp</item>
-        <item name="android:textColor">@color/colorBackground</item>
+        <item name="android:textColor">@color/colorSurface</item>
         <item name="android:paddingVertical">2dp</item>
         <item name="android:paddingHorizontal">2dp</item>
         <item name="android:layout_width">match_parent</item>

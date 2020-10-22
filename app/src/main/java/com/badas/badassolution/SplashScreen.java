@@ -69,8 +69,7 @@ public class SplashScreen extends AppCompatActivity {
             public void onTransitionTrigger(MotionLayout motionLayout, int i, boolean b, float v) {
             }
         });
-        final long waitDur = 500;
-        CountDownTimer countDownTimer = new CountDownTimer(waitDur, 1) {
+        CountDownTimer countDownTimer = new CountDownTimer(getResources().getInteger(android.R.integer.config_longAnimTime) * 2, 1) {
             @Override
             public void onTick(long millisUntilFinished) {
 

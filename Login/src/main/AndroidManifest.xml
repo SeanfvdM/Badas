@@ -5,10 +5,12 @@
         <activity
             android:name=".LoginActivity"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/BadasTheme.NoActionBar" />
         <activity
             android:name=".RegisterActivity"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/BadasTheme.NoActionBar" />
     </application>
 

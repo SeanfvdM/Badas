@@ -53,7 +53,7 @@ public class RegisterActivity extends AppCompatActivity {
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                authentication.EmailPassLogin(tiet_email.getText().toString(), tiet_password.getText().toString())
+                authentication.EmailPassRegister(tiet_email.getText().toString(), tiet_password.getText().toString())
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -76,6 +76,13 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 RegisterActivity.super.onBackPressed();
+            }
+        });
+
+        findViewById(R.id.btn_addChild).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(RegisterActivity.this, "Not implemented", Toast.LENGTH_SHORT).show();
             }
         });
 

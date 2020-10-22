@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="BadasTheme" parent="Theme.MaterialComponents.DayNight">
+        <item name="isLightTheme">true</item>
+        <item name="isMaterialTheme">true</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorSecondary">@color/colorAccent</item>
+        <item name="colorOnSecondary">@color/colorOnAccent</item>
+        <item name="android:textColor">@color/colorOnSurface</item>
+        <item name="android:iconTint">@color/colorOnSurface</item>
+
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:windowLightStatusBar">@bool/isLight</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+        <item name="android:windowLightNavigationBar">@bool/isLight</item>
+
+        <item name="backgroundColor">@color/colorSurface</item>
+        <item name="android:windowBackground">@color/colorSurface</item>
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@color/colorOnSurface</item>
+
+        <item name="toolbarStyle">@style/BadasTheme.Toolbar</item>
+        <item name="navigationViewStyle">@style/BadasTheme.NavigationView</item>
+        <item name="appBarLayoutStyle">@style/BadasTheme.AppBarOverlay</item>
+        <item name="floatingActionButtonStyle">@style/BadasTheme.FloatingActionButton</item>
+        <item name="extendedFloatingActionButtonStyle">
+            @style/BadasTheme.ExtendedFloatingActionButton.Icon
+        </item>
+        <item name="materialCardViewStyle">@style/BadasTheme.CardView</item>
+        <item name="materialButtonStyle">@style/BadasTheme.Button</item>
+        <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox
+        </item>
+        <item name="android:autofilledHighlight">@color/colorPrimarySelected</item>
+        <item name="android:windowContentTransitions">true</item>
+
+    </style>
+
+    <style name="BadasTheme.Splash" parent="BadasTheme.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:statusBarColor">#00ffffff</item>
+        <item name="android:windowLightStatusBar">@bool/isLight</item>
+        <item name="android:windowLightNavigationBar">@bool/isLight</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+</resources>
