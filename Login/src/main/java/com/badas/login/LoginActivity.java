@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.View;
@@ -41,7 +42,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         tiet_email.requestFocus();
-
+        tiet_email.setError(null);
+        tiet_password.setError(null);
     }
 
     @Override
@@ -61,6 +63,15 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //todo do validation checks
                 //tiet_email.setError("error"); //use this method to display input errors
+                if(TextUtils.isEmpty(tiet_email.getText().toString())) {
+                    tiet_email.setError("Please enter an email address");
+                    return;
+                }
+                if(TextUtils.isEmpty(tiet_password.getText().toString())) {
+                    tiet_email.setError("Please enter an password");
+                    return;
+                }
+
                 authentication.EmailPassLogin(tiet_email.getText().toString(), tiet_password.getText().toString())
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override

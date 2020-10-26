@@ -41,6 +41,9 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         tiet_email.requestFocus();
+        tiet_email.setError(null);
+        tiet_password.setError(null);
+        tiet_rePassword.setError(null);
         AutofillManager afm = this.getSystemService(AutofillManager.class);
         if (afm != null) {
             afm.requestAutofill(tiet_email);
@@ -64,6 +67,18 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //todo do validation checks
+                if(TextUtils.isEmpty(tiet_email.getText().toString())) {
+                    tiet_email.setError("Please enter an email address");
+                    return;
+                }
+                if(TextUtils.isEmpty(tiet_password.getText().toString())) {
+                    tiet_password.setError("Please enter an password");
+                    return;
+                }
+                if(tiet_password != tiet_rePassword) {
+                    tiet_rePassword.setError("Please make sure the passwords match");
+                    return;
+                }
                 //tiet_email.setError("error"); //use this method to display input errors
                 authentication.EmailPassRegister(tiet_email.getText().toString(), tiet_password.getText().toString())
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -127,7 +142,8 @@ public class RegisterActivity extends AppCompatActivity {
                 }
 
                 //todo optionally reset error messages for passwords
-
+                tiet_password.setError(null);
+                tiet_rePassword.setError(null);
                 //checks if the passwords are at the desired length
                 if (Objects.requireNonNull(tiet_password.getText()).length() >= 6
                         && Objects.requireNonNull(tiet_rePassword.getText()).length() >= 6) {
@@ -136,6 +152,7 @@ public class RegisterActivity extends AppCompatActivity {
                             Objects.requireNonNull(tiet_password.getText()).toString(),
                             Objects.requireNonNull(tiet_rePassword.getText()).toString())) {
                         //makes a ui update to show that the passwords are valid - no animation
+
                         ((TextInputLayout) findViewById(R.id.textInputLayout2)).setStartIconDrawable(
                                 ResourcesCompat.getDrawable(getResources(), R.drawable.ic_outline_check_24, getTheme()));
                         ((TextInputLayout) findViewById(R.id.textInputLayout3)).setStartIconDrawable(
@@ -145,6 +162,7 @@ public class RegisterActivity extends AppCompatActivity {
                     } else {
                         //todo display error message of mismatching passwords
                         //makes a ui update to show that the passwords are invalid - no animation
+                        tiet_password.setError("Password is invalid.");
                         ((TextInputLayout) findViewById(R.id.textInputLayout2)).setStartIconDrawable(
                                 ResourcesCompat.getDrawable(getResources(), R.drawable.ic_close, getTheme()));
                         ((TextInputLayout) findViewById(R.id.textInputLayout3)).setStartIconDrawable(
@@ -159,6 +177,7 @@ public class RegisterActivity extends AppCompatActivity {
                         // than the desired length
                         ((TextInputLayout) findViewById(R.id.textInputLayout3)).setStartIconDrawable(
                                 ResourcesCompat.getDrawable(getResources(), R.drawable.ic_outline_lock_open_24, getTheme()));
+                        tiet_password.setError("Password must be longer than 6 characters");
                         ((TextInputLayout) findViewById(R.id.textInputLayout2)).setStartIconDrawable(
                                 ResourcesCompat.getDrawable(getResources(), R.drawable.ic_outline_lock_24_white, getTheme()));
                         valid[1] = true;
@@ -168,6 +187,7 @@ public class RegisterActivity extends AppCompatActivity {
                     //checks if the password fields length is at the desired length
                     if (Objects.requireNonNull(tiet_rePassword.getText()).length() >= 6) {
                         //resets the ui of the other password field if it's length is less
+                        tiet_rePassword.setError("Password must be longer than 6 characters");
                         // than the desired length
                         ((TextInputLayout) findViewById(R.id.textInputLayout2)).setStartIconDrawable(
                                 ResourcesCompat.getDrawable(getResources(), R.drawable.ic_outline_lock_open_24, getTheme()));
