@@ -111,7 +111,7 @@
 
     <style name="ShapeAppearance.BadasTheme.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">45%</item>
+        <item name="cornerSize">30%</item>
     </style>
 
     <style name="ShapeAppearance.BadasTheme.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">

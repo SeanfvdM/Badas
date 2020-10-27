@@ -41,4 +41,11 @@
         android:label="@string/menu_game_manager"
         tools:layout="@layout/game_menu" />
 
+    <fragment
+        android:id="@+id/nav_game_template"
+        android:name="com.badas.gamelibrary.LevelSelectionFragment"
+        android:label="Game Template"
+        tools:layout="@layout/fragment_game_template" />
+
+
 </navigation>

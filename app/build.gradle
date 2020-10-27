@@ -39,6 +39,7 @@ dependencies {
     implementation project(path: ':ProfileManager')
     implementation project(path: ':StudentActivity')
     implementation project(path: ':GameManager')
+    implementation project(path: ':GameLibrary')
     implementation project(path: ':FirebaseManager')
     implementation project(path: ':Login')
     testImplementation 'junit:junit:4.13.1'

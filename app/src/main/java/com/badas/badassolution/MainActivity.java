@@ -15,6 +15,8 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.badas.badassolution.ui.placeholder.PlaceholderFragment;
+import com.badas.gamelibrary.GameFragmentTemplate;
 import com.badas.profilemanager.ManagerFragment;
 import com.badas.profilemanager.Profile;
 import com.badas.studentactivity.Student;
@@ -76,6 +78,21 @@ public class MainActivity extends AppCompatActivity {
                         .setTitle(getString(R.string.menu_game_manager))
                         .setIcon(ContextCompat.getDrawable(this, R.drawable.ic_baseline_gamepad_24))));
 
+        GameFragmentTemplate.getInstance();
+        GameFragmentTemplate.setFragmentToLoad(new PlaceholderFragment());
+        GameFragmentTemplate.setGameCallback(new GameFragmentTemplate.GameCallback() {
+            @Override
+            public void parentAttached(GameFragmentTemplate gameFragmentTemplate) {
+                super.parentAttached(gameFragmentTemplate);
+            }
+        });
+
+        DynamicMenu.getInstance().add(new DynamicMenu.SubMenu(4)
+                .setTitle("Placeholder")
+                .add(new DynamicMenu.MenuItem(R.id.nav_game_template)
+                        .setTitle("Placeholder")
+                        .setIcon(ContextCompat.getDrawable(this, R.drawable.ic_baseline_gamepad_24))));
+
         DynamicMenu.getInstance().attach(navigationView);
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -132,6 +149,8 @@ public class MainActivity extends AppCompatActivity {
                     userList.add(new Profile(com.badas.profilemanager.R.drawable.profile_icon_templete, "Avremi", "Email:\tAvremi@gmail.com \nPhone Number:\t0821986254"));
 
                     ManagerFragment.initDataSet(userList);
+                } else if (destination.getId() == R.id.nav_game_template) {
+                    GameFragmentTemplate.getGameCallback().parentCalled(MainActivity.this);
                 }
             }
         });
