@@ -27,11 +27,27 @@
         </item>
         <item name="materialCardViewStyle">@style/BadasTheme.CardView</item>
         <item name="materialButtonStyle">@style/BadasTheme.Button</item>
-        <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox
-        </item>
+        <item name="materialButtonOutlinedStyle">@style/BadasTheme.Button.OutlinedButton</item>
+        <item name="materialButtonToggleGroupStyle">@style/BadasTheme.ToggleButton</item>
+        <item name="textInputStyle">@style/BadasTheme.TextInputLayout</item>
         <item name="android:autofilledHighlight">@color/colorPrimarySelected</item>
         <item name="android:windowContentTransitions">true</item>
+    </style>
 
+    <style name="BadasTheme.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@drawable/outlined_stroke_tint</item>
+        <item name="endIconTint">@drawable/outlined_icon_tint</item>
+        <item name="startIconTint">@drawable/outlined_icon_tint</item>
+        <item name="passwordToggleTint">@drawable/outlined_icon_tint</item>
+        <item name="boxCornerRadiusBottomEnd">8dp</item>
+        <item name="boxCornerRadiusBottomStart">8dp</item>
+        <item name="boxCornerRadiusTopEnd">8dp</item>
+        <item name="boxCornerRadiusTopStart">8dp</item>
+        <item name="boxStrokeWidth">1dp</item>
+    </style>
+
+    <style name="BadasTheme.ToggleButton" parent="Widget.MaterialComponents.MaterialButtonToggleGroup">
+        <item name="materialButtonOutlinedStyle">@style/BadasTheme.Button.OutlinedButton</item>
     </style>
 
     <style name="BadasTheme.NoActionBar">
@@ -55,7 +71,7 @@
 
     <style name="BadasTheme.FullScreenDialog" parent="BadasTheme">
         <item name="android:windowIsFloating">false</item>
-        <item name="android:statusBarColor">@color/colorStroke</item>
+        <item name="android:statusBarColor">@drawable/stroke_color_selector</item>
         <item name="android:windowBackground">?attr/colorSurface</item>
     </style>
 
@@ -151,7 +167,7 @@
     </style>
 
     <style name="BadasTheme.CardView" parent="Widget.MaterialComponents.CardView">
-        <item name="strokeColor">@color/colorStroke</item>
+        <item name="strokeColor">@drawable/stroke_color_selector</item>
         <item name="cardBackgroundColor">@color/colorSurface</item>
         <item name="strokeWidth">1dp</item>
         <item name="cardElevation">0dp</item>
@@ -187,11 +203,14 @@
         <item name="android:ellipsize">marquee</item>
     </style>
 
-    <style name="BadasTheme.Button" parent="Widget.MaterialComponents.Button.UnelevatedButton"></style>
+    <style name="BadasTheme.Button" parent="Widget.MaterialComponents.Button.UnelevatedButton" />
 
-    <style name="BadasTheme.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton"></style>
+    <style name="BadasTheme.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton" />
 
-    <style name="BadasTheme.Button.OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton"></style>
+    <style name="BadasTheme.Button.OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">@drawable/stroke_color_selector</item>
+    </style>
 
     <style name="BadasTheme.Button.ErrorTextButton" parent="BadasTheme.Button.TextButton">
         <item name="android:textColor">@drawable/textbutton_color_error</item>

@@ -14,6 +14,7 @@ import com.badas.login.LoginActivity;
 public class SplashScreen extends AppCompatActivity {
     static int overrideFirebase = 1; //will clear active firebase user - set to 0 to not override and 1 to override
     boolean skip_login = false; //use to skip the login screen
+    CountDownTimer countDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +39,27 @@ public class SplashScreen extends AppCompatActivity {
             Start(LoginActivity.class);
         else
             Start(MainActivity.class);
+    }
+
+    @Override
+    protected void onStop() {
+        findViewById(R.id.motionLayout).clearAnimation();
+        countDownTimer.cancel();
+        super.onStop();
+    }
+
+    @Override
+    protected void onPause() {
+        findViewById(R.id.motionLayout).clearAnimation();
+        countDownTimer.cancel();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        findViewById(R.id.motionLayout).clearAnimation();
+        countDownTimer.cancel();
+        super.onDestroy();
     }
 
     private void Start(final Class<?> cls) {
@@ -69,7 +91,7 @@ public class SplashScreen extends AppCompatActivity {
             public void onTransitionTrigger(MotionLayout motionLayout, int i, boolean b, float v) {
             }
         });
-        CountDownTimer countDownTimer = new CountDownTimer(getResources().getInteger(android.R.integer.config_longAnimTime) * 2, 1) {
+        countDownTimer = new CountDownTimer(getResources().getInteger(android.R.integer.config_longAnimTime) * 2, 1) {
             @Override
             public void onTick(long millisUntilFinished) {
 

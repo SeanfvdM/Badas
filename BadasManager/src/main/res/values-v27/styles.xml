@@ -31,7 +31,9 @@
         </item>
         <item name="materialCardViewStyle">@style/BadasTheme.CardView</item>
         <item name="materialButtonStyle">@style/BadasTheme.Button</item>
-        <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox
+        <item name="materialButtonOutlinedStyle">@style/BadasTheme.Button.OutlinedButton</item>
+        <item name="materialButtonToggleGroupStyle">@style/BadasTheme.ToggleButton</item>
+        <item name="textInputStyle">@style/BadasTheme.TextInputLayout
         </item>
         <item name="android:autofilledHighlight">@color/colorPrimarySelected</item>
         <item name="android:windowContentTransitions">true</item>

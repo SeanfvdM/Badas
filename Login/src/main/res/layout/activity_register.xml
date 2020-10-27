@@ -57,6 +57,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
         app:passwordToggleEnabled="true"
+        app:passwordToggleDrawable="@drawable/design_password_eye"
         app:startIconDrawable="@drawable/ic_outline_lock_open_24">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -64,6 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autofillHints="newPassword"
+
             android:hint="@string/password"
             android:importantForAutofill="yes"
             android:inputType="textPassword"

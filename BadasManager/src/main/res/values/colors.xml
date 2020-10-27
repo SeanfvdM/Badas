@@ -5,7 +5,7 @@
     <color name="colorSurface">#ffffff</color>
     <color name="colorOnSurface">#000000</color>
     <color name="colorOnSurfaceLight">#80000000</color>
-    <color name="colorStroke">#40000000</color>
+    <color name="colorStroke">#000000</color>
     <color name="colorRipple">#1A000000</color>
     <color name="colorItemBackground">#08000000</color>
 
