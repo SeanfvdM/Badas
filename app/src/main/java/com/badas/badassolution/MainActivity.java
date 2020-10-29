@@ -12,10 +12,11 @@ import androidx.customview.widget.Openable;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.badas.badassolution.ui.placeholder.PlaceholderFragment;
+import com.badas.gamelibrary.ColorGame;
 import com.badas.gamelibrary.GameFragmentTemplate;
 import com.badas.profilemanager.ManagerFragment;
 import com.badas.profilemanager.Profile;
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final NavigationView navigationView = findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
 
         DynamicMenu.getInstance().add(
                 new DynamicMenu.MenuItem(R.id.nav_home)
@@ -78,16 +79,7 @@ public class MainActivity extends AppCompatActivity {
                         .setTitle(getString(R.string.menu_game_manager))
                         .setIcon(ContextCompat.getDrawable(this, R.drawable.ic_baseline_gamepad_24))));
 
-        GameFragmentTemplate.getInstance();
-        GameFragmentTemplate.setFragmentToLoad(new PlaceholderFragment());
-        GameFragmentTemplate.setGameCallback(new GameFragmentTemplate.GameCallback() {
-            @Override
-            public void parentAttached(GameFragmentTemplate gameFragmentTemplate) {
-                super.parentAttached(gameFragmentTemplate);
-            }
-        });
-
-        DynamicMenu.getInstance().add(new DynamicMenu.SubMenu(4)
+        DynamicMenu.getInstance().add(new DynamicMenu.SubMenu(-1)
                 .setTitle("Placeholder")
                 .add(new DynamicMenu.MenuItem(R.id.nav_game_template)
                         .setTitle("Placeholder")
@@ -100,13 +92,17 @@ public class MainActivity extends AppCompatActivity {
                 .setOpenableLayout((Openable) findViewById(R.id.drawer_layout))
                 .build();
 
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        NavController navController = navHostFragment.getNavController();
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
             public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
+                if (!getSupportActionBar().isShowing())
+                    getSupportActionBar().show();
                 if (destination.getId() == R.id.nav_result || destination.getId() == R.id.nav_student_result) {
                     if (ResultFragment.getCurrentResultsData().size() < 1) {
                         ArrayList<StudentResult> resultsData = new ArrayList<>();
@@ -150,6 +146,21 @@ public class MainActivity extends AppCompatActivity {
 
                     ManagerFragment.initDataSet(userList);
                 } else if (destination.getId() == R.id.nav_game_template) {
+                    GameFragmentTemplate.init(
+                            new ColorGame(),
+                            new GameFragmentTemplate.GameCallback() {
+                                @Override
+                                public void parentCalled(AppCompatActivity compatActivity) {
+                                    super.parentCalled(compatActivity);
+                                    getSupportActionBar().hide();
+                                }
+
+                                @Override
+                                public void doneClicked() {
+                                    getSupportActionBar().show(); //todo change this for final
+                                    super.doneClicked();
+                                }
+                            });
                     GameFragmentTemplate.getGameCallback().parentCalled(MainActivity.this);
                 }
             }
