@@ -80,9 +80,9 @@ public class MainActivity extends AppCompatActivity {
                         .setIcon(ContextCompat.getDrawable(this, R.drawable.ic_baseline_gamepad_24))));
 
         DynamicMenu.getInstance().add(new DynamicMenu.SubMenu(-1)
-                .setTitle("Placeholder")
+                .setTitle("Games")
                 .add(new DynamicMenu.MenuItem(R.id.nav_game_template)
-                        .setTitle("Placeholder")
+                        .setTitle("Color Game (WIP)")
                         .setIcon(ContextCompat.getDrawable(this, R.drawable.ic_baseline_gamepad_24))));
 
         DynamicMenu.getInstance().attach(navigationView);

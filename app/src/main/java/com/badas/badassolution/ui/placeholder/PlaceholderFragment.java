@@ -45,6 +45,13 @@ public class PlaceholderFragment extends Fragment {
                         .show(getChildFragmentManager(), "Fonts");
             }
         });
+
+        root.findViewById(R.id.btn_signOut).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+            }
+        });
         return root;
     }
 }

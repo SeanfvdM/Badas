@@ -71,11 +71,11 @@ public class RegisterActivity extends AppCompatActivity {
                     tiet_email.setError("Please enter an email address");
                     return;
                 }
-                if(TextUtils.isEmpty(tiet_password.getText().toString())) {
+                if (TextUtils.isEmpty(tiet_password.getText().toString())) {
                     tiet_password.setError("Please enter an password");
                     return;
                 }
-                if(tiet_password != tiet_rePassword) {
+                if (!tiet_password.getText().toString().equals(tiet_rePassword.getText().toString())) {
                     tiet_rePassword.setError("Please make sure the passwords match");
                     return;
                 }

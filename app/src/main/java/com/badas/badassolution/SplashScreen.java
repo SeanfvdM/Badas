@@ -12,8 +12,8 @@ import com.badas.firebasemanager.FirebaseManager;
 import com.badas.login.LoginActivity;
 
 public class SplashScreen extends AppCompatActivity {
-    static int overrideFirebase = 1; //will clear active firebase user - set to 0 to not override and 1 to override
-    boolean skip_login = true; //use to skip the login screen
+    static int overrideFirebase = 0; //will clear active firebase user - set to 0 to not override and 1 to override
+    boolean skip_login = false; //use to skip the login screen
     CountDownTimer countDownTimer;
 
     @Override
