@@ -38,6 +38,9 @@
         <item name="android:autofilledHighlight">@color/colorPrimarySelected</item>
         <item name="android:windowContentTransitions">true</item>
 
+        <item name="shapeAppearanceLargeComponent">
+            @style/ShapeAppearance.BadasTheme.LargeComponent
+        </item>
     </style>
 
     <style name="BadasTheme.Splash" parent="BadasTheme.NoActionBar">

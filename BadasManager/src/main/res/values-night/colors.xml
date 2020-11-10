@@ -9,7 +9,9 @@
     <color name="colorRipple">#1Affffff</color>
     <color name="colorItemBackground">#08000000</color>
 
-    <color name="colorError">#EA3342</color>
+    <color name="background_lighter">#323232</color>
+
+    <color name="colorError">#CF6679</color>
     <color name="colorOnError">#ffffff</color>
 
     <color name="colorAccent">#f27e21</color>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity2">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/mobile_navigation" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:visibility="gone"
+        app:elevation="4dp"
+        app:layout_anchor="@+id/bottomAppBar"
+        app:layout_anchorGravity="top|center"
+        app:srcCompat="@drawable/ic_placeholder"
+        tools:visibility="visible" />
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottomAppBar"
+        style="@style/BadasTheme.BottomAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:elevation="4dp"
+        app:fabAlignmentMode="end"
+        app:fabAnimationMode="scale"
+        app:fabCradleMargin="8dp"
+        app:fabCradleRoundedCornerRadius="12dp"
+        app:hideOnScroll="true"
+        app:navigationIcon="@drawable/ic_logo_menu" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

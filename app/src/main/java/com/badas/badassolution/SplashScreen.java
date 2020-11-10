@@ -3,6 +3,7 @@ package com.badas.badassolution;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.motion.widget.MotionLayout;
@@ -13,7 +14,7 @@ import com.badas.login.LoginActivity;
 
 public class SplashScreen extends AppCompatActivity {
     static int overrideFirebase = 0; //will clear active firebase user - set to 0 to not override and 1 to override
-    boolean skip_login = false; //use to skip the login screen
+    boolean skip_login = true; //use to skip the login screen
     CountDownTimer countDownTimer;
 
     @Override
@@ -28,17 +29,29 @@ public class SplashScreen extends AppCompatActivity {
         super.onStart();
         //todo do logic here
         FirebaseManager.getInstance(this);
-        FirebaseManager.Authentication authentication = new FirebaseManager.Authentication();
+        final FirebaseManager.Authentication authentication = new FirebaseManager.Authentication();
         if (overrideFirebase == 1) {
             authentication.SignOut();
             overrideFirebase++;
         }
 
-
-        if (authentication.CheckForUser() == null && !skip_login)
-            Start(LoginActivity.class);
-        else
-            Start(MainActivity.class);
+        boolean demo = false;
+        if (!demo) {
+            if (authentication.CheckForUser() == null && !skip_login)
+                Start(LoginActivity.class);
+            else
+                Start(MainActivity2.class);
+        } else {
+            findViewById(R.id.appLogo).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (authentication.CheckForUser() == null && !skip_login)
+                        Start(LoginActivity.class);
+                    else
+                        Start(MainActivity2.class);
+                }
+            });
+        }
     }
 
     @Override

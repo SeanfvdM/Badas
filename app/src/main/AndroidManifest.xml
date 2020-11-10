@@ -10,12 +10,22 @@
         android:supportsRtl="true"
         android:theme="@style/BadasTheme">
         <activity
+            android:name=".MainActivity2"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:theme="@style/BadasTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".SplashScreen"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/BadasTheme.Splash">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
+
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>

@@ -9,12 +9,11 @@ import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.badas.badasstyle.BadasFragment;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -24,11 +23,10 @@ import java.util.Objects;
  * By: Seanf
  * Created: 05,September,2020
  */
-public class ResultFragment extends Fragment {
+public class ResultFragment extends BadasFragment {
     static ArrayList<StudentResult> resultsData = new ArrayList<>();
     static ResultsAdapter resultsAdapter = new ResultsAdapter(resultsData);
     RecyclerView recyclerView;
-    FloatingActionButton scrollToTop;
     boolean scrollingToTop = false;
 
     @Nullable
@@ -36,9 +34,9 @@ public class ResultFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(Objects.requireNonNull(getContext()).getResources().getLayout(R.layout.result_layout), container, false);
         recyclerView = view.findViewById(R.id.rv_Results);
-        scrollToTop = view.findViewById(R.id.scrollTop);
-        scrollToTop.setVisibility(View.GONE);
-        scrollToTop.setOnClickListener(new View.OnClickListener() {
+        floatingActionButton.setVisibility(View.GONE);
+        floatingActionButton.setImageDrawable(requireContext().getDrawable(R.drawable.ic_arrow_up));
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 recyclerView.smoothScrollToPosition(0);
@@ -51,9 +49,9 @@ public class ResultFragment extends Fragment {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 if (recyclerView.computeVerticalScrollOffset() > 0 && !scrollingToTop)
-                    scrollToTop.show();
+                    floatingActionButton.show();
                 else
-                    scrollToTop.hide();
+                    floatingActionButton.hide();
 
                 if (recyclerView.computeVerticalScrollOffset() == 0)
                     scrollingToTop = false;

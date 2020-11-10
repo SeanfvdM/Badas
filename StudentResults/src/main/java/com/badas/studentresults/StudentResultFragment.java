@@ -38,9 +38,9 @@ public class StudentResultFragment extends ResultFragment {
         loadCurrent();
         View view = inflater.inflate(Objects.requireNonNull(getContext()).getResources().getLayout(R.layout.student_result_layout), container, false);
         recyclerView = view.findViewById(R.id.rv_Results);
-        scrollToTop = view.findViewById(R.id.scrollTop);
-        scrollToTop.setVisibility(View.GONE);
-        scrollToTop.setOnClickListener(new View.OnClickListener() {
+        floatingActionButton.setVisibility(View.GONE);
+        floatingActionButton.setImageDrawable(requireContext().getDrawable(R.drawable.ic_arrow_up));
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 recyclerView.smoothScrollToPosition(0);
@@ -60,9 +60,9 @@ public class StudentResultFragment extends ResultFragment {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 if (recyclerView.computeVerticalScrollOffset() > 0 && !scrollingToTop)
-                    scrollToTop.show();
+                    floatingActionButton.show();
                 else
-                    scrollToTop.hide();
+                    floatingActionButton.hide();
             }
         });
         spinner = view.findViewById(R.id.spinner);

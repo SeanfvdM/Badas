@@ -32,6 +32,9 @@
         <item name="textInputStyle">@style/BadasTheme.TextInputLayout</item>
         <item name="android:autofilledHighlight">@color/colorPrimarySelected</item>
         <item name="android:windowContentTransitions">true</item>
+        <item name="shapeAppearanceLargeComponent">
+            @style/ShapeAppearance.BadasTheme.LargeComponent
+        </item>
     </style>
 
     <style name="BadasTheme.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
@@ -111,7 +114,7 @@
 
     <style name="ShapeAppearance.BadasTheme.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">30%</item>
+        <item name="cornerSize">40%</item>
     </style>
 
     <style name="ShapeAppearance.BadasTheme.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
@@ -133,7 +136,7 @@
 
     <style name="ShapeAppearance.BadasTheme.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">50%</item>
+        <item name="cornerSize">@dimen/large_shape_corners</item>
     </style>
 
     <style name="BadasTheme.NavigationView.Popup" parent="Widget.AppCompat.PopupMenu">
@@ -217,81 +220,15 @@
         <item name="rippleColor">@color/colorError</item>
     </style>
 
-    <style name="TextAppearance.BadasTheme.Headline1" parent="TextAppearance.MaterialComponents.Headline1">
-        <item name="fontFamily">@font/lato</item>
-        <item name="android:fontFamily">@font/lato</item>
-        <item name="android:textSize">101sp</item>
+    <style name="BadasTheme.MenuItem" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="cornerRadius">@dimen/large_shape_corners</item>
     </style>
 
-    <style name="TextAppearance.BadasTheme.Headline2" parent="TextAppearance.MaterialComponents.Headline2">
-        <item name="fontFamily">@font/lato</item>
-        <item name="android:fontFamily">@font/lato</item>
-        <item name="android:textSize">63sp</item>
+    <style name="BadasTheme.MenuItem.Land" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="cornerRadius">@dimen/large_shape_corners</item>
     </style>
 
-    <style name="TextAppearance.BadasTheme.Headline3" parent="TextAppearance.MaterialComponents.Headline3">
-        <item name="fontFamily">@font/lato</item>
-        <item name="android:fontFamily">@font/lato</item>
-        <item name="android:textSize">50sp</item>
-    </style>
-
-    <style name="TextAppearance.BadasTheme.Headline4" parent="TextAppearance.MaterialComponents.Headline4">
-        <item name="fontFamily">@font/lato</item>
-        <item name="android:fontFamily">@font/lato</item>
-        <item name="android:textSize">36sp</item>
-    </style>
-
-    <style name="TextAppearance.BadasTheme.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
-        <item name="fontFamily">@font/lato</item>
-        <item name="android:fontFamily">@font/lato</item>
-        <item name="android:textSize">25sp</item>
-    </style>
-
-    <style name="TextAppearance.BadasTheme.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
-        <item name="fontFamily">@font/lato</item>
-        <item name="android:fontFamily">@font/lato</item>
-        <item name="android:textSize">21sp</item>
-    </style>
-
-    <style name="TextAppearance.BadasTheme.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
-        <item name="fontFamily">@font/lato</item>
-        <item name="android:fontFamily">@font/lato</item>
-        <item name="android:textSize">17sp</item>
-    </style>
-
-    <style name="TextAppearance.BadasTheme.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
-        <item name="fontFamily">@font/lato</item>
-        <item name="android:fontFamily">@font/lato</item>
-        <item name="android:textSize">15sp</item>
-    </style>
-
-    <style name="TextAppearance.BadasTheme.Body1" parent="TextAppearance.MaterialComponents.Body1">
-        <item name="fontFamily">@font/roboto_light</item>
-        <item name="android:fontFamily">@font/roboto_light</item>
-        <item name="android:textSize">16sp</item>
-    </style>
-
-    <style name="TextAppearance.BadasTheme.Body2" parent="TextAppearance.MaterialComponents.Body2">
-        <item name="fontFamily">@font/roboto_light</item>
-        <item name="android:fontFamily">@font/roboto_light</item>
-        <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="TextAppearance.BadasTheme.Button" parent="TextAppearance.MaterialComponents.Button">
-        <item name="fontFamily">@font/roboto_light</item>
-        <item name="android:fontFamily">@font/roboto_light</item>
-        <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="TextAppearance.BadasTheme.Caption" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="fontFamily">@font/roboto_light</item>
-        <item name="android:fontFamily">@font/roboto_light</item>
-        <item name="android:textSize">12sp</item>
-    </style>
-
-    <style name="TextAppearance.BadasTheme.Overline" parent="TextAppearance.MaterialComponents.Overline">
-        <item name="fontFamily">@font/roboto_light</item>
-        <item name="android:fontFamily">@font/roboto_light</item>
-        <item name="android:textSize">10sp</item>
+    <style name="BadasTheme.BottomAppBar" parent="Widget.MaterialComponents.BottomAppBar">
+        <item name="shapeAppearance">@style/ShapeAppearance.BadasTheme.SmallComponent</item>
     </style>
 </resources>

@@ -6,11 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.badas.badasstyle.BadasFragment;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -24,13 +24,13 @@ import java.util.ArrayList;
  */
 
 //converted the Activity to a fragment and moved it to its own library
-public class ManagerFragment extends Fragment {
+public class ManagerFragment extends BadasFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_manager, container, false);
+        View view = inflater.inflate(R.layout.fragment_manager, container, false);
 
         recyclerView = view.findViewById(R.id.my_recycler_viewer);
         //removed has fixed size
@@ -65,15 +65,21 @@ public class ManagerFragment extends Fragment {
                     if (userList.get(i).equals(deletedProfile)) {
                         userList.remove(i);
                         profileAdapter.notifyItemRemoved(i);
-                        undoOption(deletedProfile,i);
+                        undoOption(deletedProfile, i);
                         break;
                     }
                 }
             }
         });
 
-        //todo add onclick for add profile
-
+        floatingActionButton.setImageDrawable(requireContext().getDrawable(R.drawable.ic_person_add));
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //todo update
+                Snackbar.make(v, "Not implemented", BaseTransientBottomBar.LENGTH_SHORT).setAnchorView(v).show();
+            }
+        });
         return view;
     }
 
