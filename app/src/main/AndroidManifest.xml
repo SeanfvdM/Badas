@@ -10,6 +10,15 @@
         android:supportsRtl="true"
         android:theme="@style/BadasTheme">
         <activity
+            android:name=".ChildScreen.MainChildActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="landscape"
+            android:theme="@style/BadasTheme.Child">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".MainActivity2"
             android:label="@string/app_name"
             android:launchMode="singleTask"

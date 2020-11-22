@@ -27,6 +27,8 @@ import java.util.List;
  * Created: 27,October,2020
  */
 public class GameFragmentTemplate extends Fragment {
+    public static String Game = "Template";
+
     protected static GameFragmentTemplate instance;
     protected static boolean usePoints = false, useLevels = false;
     private static GameView mFragmentToLoad = null;
@@ -37,11 +39,11 @@ public class GameFragmentTemplate extends Fragment {
     TextView tv_levels;
     private RecyclerView recyclerView;
 
-    public static void init(GameView fragmentToLoad, GameCallback gameCallback) {
-        if (instance == null)
-            instance = new GameFragmentTemplate();
+    public static GameFragmentTemplate init(GameView fragmentToLoad, GameCallback gameCallback) {
+        instance = new GameFragmentTemplate();
         mFragmentToLoad = fragmentToLoad;
         GameFragmentTemplate.gameCallback = gameCallback;
+        return instance;
     }
 
     public static GameCallback getGameCallback() {

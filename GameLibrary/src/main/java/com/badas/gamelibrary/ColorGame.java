@@ -75,6 +75,7 @@ public class ColorGame extends GameView {
 
     @Override
     GameAdapter<?> getGameAdapter() {
+        colorList.clear();
         //todo swap the order or the colors
         colorList.add(new ColorData(Color.valueOf(Color.RED), "Red"));
         colorList.add(new ColorData(Color.valueOf(Color.GREEN), "Green"));

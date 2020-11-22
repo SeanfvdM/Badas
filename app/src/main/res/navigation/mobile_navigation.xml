@@ -44,8 +44,13 @@
     <fragment
         android:id="@+id/nav_game_template"
         android:name="com.badas.gamelibrary.GameFragmentTemplate"
-        android:label="Game Template"
+        android:label="Color Game"
         tools:layout="@layout/fragment_game_template" />
+
+    <fragment
+        android:id="@+id/settings"
+        android:name="com.badas.badassolution.SettingsFragment"
+        android:label="Settings" />
 
 
 </navigation>

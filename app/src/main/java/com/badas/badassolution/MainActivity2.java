@@ -3,6 +3,7 @@ package com.badas.badassolution;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -68,6 +69,13 @@ public class MainActivity2 extends AppCompatActivity {
             }
         });
 
+        @IdRes int homeId = R.id.nav_home;
+        if (navHostFragment.getNavController().getCurrentDestination() == null)
+            navHostFragment.getNavController().navigate(homeId);
+
+        assert navHostFragment != null;
+        navHostFragment.getNavController().popBackStack(homeId, false);
+
         sheetMenu = new SheetMenuBuilder(navHostFragment.getNavController())
                 .setDialogMenuListener(new SheetMenu.DialogMenuListener() {
                     @Override
@@ -80,7 +88,7 @@ public class MainActivity2 extends AppCompatActivity {
                         showAppbar();
                     }
                 })
-                .addMenuItem(R.id.nav_home, R.drawable.ic_home, getString(R.string.menu_home), 0)
+                .addMenuItem(homeId, R.drawable.ic_home, getString(R.string.menu_home), 0)
                 .addMenuItem(R.id.nav_result, R.drawable.ic_result, getString(R.string.menu_result), 0)
                 .addMenuItem(R.id.nav_student_result, R.drawable.ic_result_filter, getString(R.string.menu_student_result), 0)
                 .addMenuItem(R.id.nav_profile_manager, R.drawable.ic_work, getString(R.string.menu_profile_manager), 0)

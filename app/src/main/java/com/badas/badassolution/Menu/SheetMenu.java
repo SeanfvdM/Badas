@@ -19,6 +19,8 @@ import com.badas.badassolution.R;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
 
+import java.util.Objects;
+
 public class SheetMenu extends BottomSheetDialogFragment {
     private final DialogMenuListener dialogMenuListener;
     private final NavController controller;
@@ -43,6 +45,19 @@ public class SheetMenu extends BottomSheetDialogFragment {
             menuHolder.setLayoutManager(new LinearLayoutManager(requireContext()));
         }
         menuHolder.setAdapter(menuAdapter);
+
+        view.findViewById(R.id.fab_settings).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                controller.navigate(R.id.settings);
+                for (SheetMenuItem item : menu) {
+                    item.button.setClickable(true);
+                    item.button.setChecked(false);
+                }
+                menuAdapter.notifyDataSetChanged();
+                dismiss();
+            }
+        });
         return view;
     }
 
@@ -135,7 +150,7 @@ public class SheetMenu extends BottomSheetDialogFragment {
             } catch (Exception ignored) {
             }
             holder.item.setText(menu[position].getLabel());
-            if (menu[position].getDestination() == controller.getCurrentDestination()) {
+            if (menu[position].getDestination().getId() == Objects.requireNonNull(controller.getCurrentDestination()).getId()) {
                 holder.item.setClickable(false);
                 holder.item.setChecked(true);
             }

@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.core.app.ActivityOptionsCompat;
 
+import com.badas.badassolution.ChildScreen.MainChildActivity;
 import com.badas.firebasemanager.FirebaseManager;
 import com.badas.login.LoginActivity;
 
@@ -35,13 +36,8 @@ public class SplashScreen extends AppCompatActivity {
             overrideFirebase++;
         }
 
-        boolean demo = false;
-        if (!demo) {
-            if (authentication.CheckForUser() == null && !skip_login)
-                Start(LoginActivity.class);
-            else
-                Start(MainActivity2.class);
-        } else {
+        boolean demo = false, isChild = true;
+        if (demo) {
             findViewById(R.id.appLogo).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -51,6 +47,14 @@ public class SplashScreen extends AppCompatActivity {
                         Start(MainActivity2.class);
                 }
             });
+        } else if (isChild) {
+            Start(MainChildActivity.class);
+            GameState.init();
+        } else {
+            if (authentication.CheckForUser() == null && !skip_login)
+                Start(LoginActivity.class);
+            else
+                Start(MainActivity2.class);
         }
     }
 

@@ -64,6 +64,14 @@
         <item name="android:windowLightStatusBar">@bool/isLight</item>
     </style>
 
+    <style name="BadasTheme.Child" parent="BadasTheme.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="navigationMode">tabMode</item>
+    </style>
+
     <style name="BadasTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.ActionBar" />
 
     <style name="BadasTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents" />
@@ -88,6 +96,14 @@
         <item name="materialThemeOverlay">@style/ThemeOverlay.BadasTheme.FloatingActionButton</item>
     </style>
 
+    <style name="BadasTheme.FloatingActionButton.Menu" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.BadasTheme.SmallComponent</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.BadasTheme.FloatingActionButton</item>
+        <item name="android:tint">@color/colorOnBackground</item>
+        <item name="tint">@color/colorOnBackground</item>
+        <item name="android:backgroundTint">@color/background_lighter</item>
+    </style>
+
     <style name="BadasTheme.ExtendedFloatingActionButton.Icon" parent="Widget.MaterialComponents.ExtendedFloatingActionButton.Icon">
         <item name="materialThemeOverlay">@style/ThemeOverlay.BadasTheme.FloatingActionButton</item>
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.BadasTheme.SmallComponent</item>
@@ -95,7 +111,7 @@
 
     <style name="BadasTheme.ExtendedFloatingActionButton" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
         <item name="materialThemeOverlay">@style/ThemeOverlay.BadasTheme.FloatingActionButton</item>
-        <item name="shapeAppearanceOverlay"> @style/ShapeAppearance.BadasTheme.SmallComponent</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.BadasTheme.SmallComponent</item>
     </style>
 
     <style name="ThemeOverlay.BadasTheme.FloatingActionButton" parent="">
