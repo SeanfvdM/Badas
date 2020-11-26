@@ -55,6 +55,7 @@ public class FontBottomDialogFragment extends BottomSheetDialogFragment {
     private Typeface selectedTypeface;
     private Font selectedFont;
     private FontListener fontListener;
+    private String selectedVariant;
 
     public FontBottomDialogFragment(String apiKey) {
         this.apiKey = apiKey;
@@ -121,8 +122,9 @@ public class FontBottomDialogFragment extends BottomSheetDialogFragment {
                     Chip chip = view.findViewById(checkedId);
                     for (int i = 0; i < selected.getVariants().length; i++) {
                         if (selected.getVariants()[i].equalsIgnoreCase(chip.getTag().toString())) {
+                            selectedVariant = selected.getVariants()[i];
                             loadFont(new GoogleFontsQuery(selected.getFamily())
-                                    .extractVariant(selected.getVariants()[i])
+                                    .extractVariant(selectedVariant)
                                     .Build());
                             return;
                         }
@@ -203,8 +205,9 @@ public class FontBottomDialogFragment extends BottomSheetDialogFragment {
         view.findViewById(R.id.btn_select).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                selectedFont.setTypeface(selectedTypeface);
                 try {
-                    fontListener.onFontSelectedListener(selectedFont, selectedTypeface);
+                    fontListener.onFontSelectedListener(selectedVariant, selectedFont, selectedTypeface);
                 } catch (Exception ignored) {
 
                 }
@@ -394,6 +397,6 @@ public class FontBottomDialogFragment extends BottomSheetDialogFragment {
     }
 
     public interface FontListener {
-        void onFontSelectedListener(Font lastSelectedFont, Typeface lastSelectedTypeface);
+        void onFontSelectedListener(String lastSelectedFontVariant, Font lastSelectedFont, Typeface lastSelectedTypeface);
     }
 }

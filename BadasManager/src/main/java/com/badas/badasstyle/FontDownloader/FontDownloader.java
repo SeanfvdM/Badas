@@ -12,6 +12,8 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -129,6 +131,14 @@ public class FontDownloader {
                             subsetStrArray[j] = subsets.getString(j);
                         }
 
+                        JSONObject files = c.getJSONObject("files");
+                        HashMap<String, String> fileStrArray = new HashMap<>();
+
+                        for (Iterator<String> it = files.keys(); it.hasNext(); ) {
+                            String key = it.next();
+                            fileStrArray.put(key, files.getString(key));
+                        }
+
                         String version = c.getString("version");
                         String lastModified = c.getString("lastModified");
                         fontArrayList.add(new Font()
@@ -137,6 +147,7 @@ public class FontDownloader {
                                 .setVariants(variantStrArray)
                                 .setSubset(subsetStrArray)
                                 .setVersion(version)
+                                .setFiles(fileStrArray)
                                 .setLastModified(
                                         new SimpleDateFormat(
                                                 "yyyy-MM-dd",

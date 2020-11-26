@@ -27,15 +27,9 @@ import com.google.firebase.auth.AuthResult;
 import java.util.Objects;
 
 public class RegisterActivity extends AppCompatActivity {
-
-    private static Class<?> from;
     MaterialButton btn_login, btn_addChild;
     TextInputEditText tiet_email, tiet_password, tiet_rePassword;
     FirebaseManager.Authentication authentication;
-
-    public static void setFrom(Class<?> from) {
-        RegisterActivity.from = from;
-    }
 
     @Override
     protected void onStart() {
@@ -85,7 +79,7 @@ public class RegisterActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
-                                    Intent intent = new Intent(RegisterActivity.this, from);
+                                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.from);
                                     ActivityOptionsCompat activityOptionsCompat =
                                             ActivityOptionsCompat.makeSceneTransitionAnimation(RegisterActivity.this, findViewById(R.id.appLogo), "appLogo");
                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -9,52 +9,63 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.core.app.ActivityOptionsCompat;
 
+import com.badas.badasoptions.General;
+import com.badas.badasoptions.Settings;
 import com.badas.badassolution.ChildScreen.MainChildActivity;
 import com.badas.firebasemanager.FirebaseManager;
 import com.badas.login.LoginActivity;
 
 public class SplashScreen extends AppCompatActivity {
-    static int overrideFirebase = 0; //will clear active firebase user - set to 0 to not override and 1 to override
-    boolean skip_login = true; //use to skip the login screen
     CountDownTimer countDownTimer;
+
+    boolean isGeneral = false, isChild = true, isGuardian = false, skipLogin = false;
+    boolean overrideFirebase = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
-        ((MotionLayout) findViewById(R.id.motionLayout)).transitionToStart();
+        new General(MainActivity2.class, MainChildActivity.class, LoginActivity.class);
+        Settings.init(this, new Settings.WaitingEvent() {
+            @Override
+            public void loaded() {
+                ((MotionLayout) findViewById(R.id.motionLayout)).transitionToStart();
+            }
+        });
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        //todo do logic here
-        FirebaseManager.getInstance(this);
-        final FirebaseManager.Authentication authentication = new FirebaseManager.Authentication();
-        if (overrideFirebase == 1) {
-            authentication.SignOut();
-            overrideFirebase++;
-        }
-
-        boolean demo = false, isChild = true;
-        if (demo) {
+        if (General.getInstance().isDemo())
             findViewById(R.id.appLogo).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (authentication.CheckForUser() == null && !skip_login)
-                        Start(LoginActivity.class);
-                    else
-                        Start(MainActivity2.class);
+                    load();
                 }
             });
-        } else if (isChild) {
-            Start(MainChildActivity.class);
-            GameState.init();
-        } else {
-            if (authentication.CheckForUser() == null && !skip_login)
-                Start(LoginActivity.class);
-            else
-                Start(MainActivity2.class);
+        else
+            load();
+    }
+
+    private void load() {
+        FirebaseManager.getInstance(this);
+        final FirebaseManager.Authentication authentication = new FirebaseManager.Authentication();
+        if (overrideFirebase) {
+            authentication.SignOut();
+            overrideFirebase = !overrideFirebase;
+        }
+        if (authentication.CheckForUser() == null && !skipLogin)
+            Start(General.getInstance().getLoginActivity());
+        else {
+            //used to load certain settings
+            if (isChild) {
+                Start(General.getInstance().getChildActivity());
+                GameState.init();
+            } else if (isGeneral || isGuardian) {
+                Start(General.getInstance().getUserActivity());
+            }
         }
     }
 

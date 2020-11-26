@@ -4,6 +4,7 @@ import android.graphics.Typeface;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -18,10 +19,14 @@ public class Font {
     private String[] variants = new String[0];
     private String version;
     private Date lastModified;
-    private String[] files = new String[0];
+    private HashMap<String, String> files = new HashMap<>();
     private String category;
     private Typeface typeface;
     private boolean available = true;
+
+    public String getFile(String fileKey) {
+        return files.get(fileKey);
+    }
 
     Font() {
     }
@@ -82,7 +87,7 @@ public class Font {
         return this;
     }
 
-    public String[] getFiles() {
+    public HashMap<String, String> getFiles() {
         return files;
     }
 
@@ -95,7 +100,7 @@ public class Font {
         return category;
     }
 
-    public Font setFiles(String[] files) {
+    public Font setFiles(HashMap<String, String> files) {
         this.files = files;
         return this;
     }

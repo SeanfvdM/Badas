@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.badas.badasoptions.Settings;
 import com.badas.badassolution.BuildConfig;
 import com.badas.badassolution.R;
 import com.badas.badasstyle.FontDownloader.Font;
@@ -27,14 +28,17 @@ public class PlaceholderFragment extends Fragment {
         final TextView textView = root.findViewById(R.id.text_placeholder);
         textView.setText("This is a placeholder screen");
 
-        final FontDialogFragment fontDialogFragment = new FontDialogFragment(BuildConfig.GoogleFont_Key);
-        fontDialogFragment.showRelativeFontSize();
-        fontDialogFragment.setFontListener(new FontDialogFragment.FontListener() {
+        final FontBottomDialogFragment fontBottomDialogFragment =
+                new FontBottomDialogFragment(BuildConfig.GoogleFont_Key)
+                        .showRelativeFontSize();
+        fontBottomDialogFragment.setFontListener(new FontBottomDialogFragment.FontListener() {
             @Override
-            public void onFontSelectedListener(Font lastSelectedFont, Typeface lastSelectedTypeface) {
+            public void onFontSelectedListener(String lastSelectedFontVariant, Font lastSelectedFont, Typeface lastSelectedTypeface) {
                 Toast.makeText(requireContext(), lastSelectedFont.getFamily(), Toast.LENGTH_SHORT).show();
-            }
 
+                Settings.Font.setSelectedFont(lastSelectedFont);
+                Settings.Font.storeFont(lastSelectedFontVariant);
+            }
         });
 
         Button button = root.findViewById(R.id.font_button);

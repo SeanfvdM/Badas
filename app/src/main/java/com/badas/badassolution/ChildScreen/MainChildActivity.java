@@ -3,6 +3,7 @@ package com.badas.badassolution.ChildScreen;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -136,6 +137,7 @@ public class MainChildActivity extends AppCompatActivity {
             return currentScreen;
         }
 
+        @NonNull
         @Override
         public Fragment createFragment(int position) {
             currentScreen = gameSelectorFragments.keySet().toArray()[position].toString();

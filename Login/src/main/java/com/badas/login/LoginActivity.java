@@ -28,7 +28,7 @@ import com.google.firebase.auth.AuthResult;
 import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
-    private static Class<?> from;
+    static Class<?> from;
     MaterialButton btn_login;
     TextInputEditText tiet_email, tiet_password;
     FirebaseManager.Authentication authentication;
