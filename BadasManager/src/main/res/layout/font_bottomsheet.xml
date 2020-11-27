@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    android:theme="@style/BadasTheme">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -92,6 +94,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:padding="4dp"
+                app:cardBackgroundColor="@color/background_lighter"
                 app:cardElevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -107,7 +110,7 @@
                     android:padding="16dp"
                     android:text="@string/loading_fonts"
                     android:textAlignment="center"
-                    android:textColor="?attr/colorOnSecondary"
+                    android:textColor="@color/colorOnSurface"
                     android:textSize="18sp" />
 
             </com.google.android.material.card.MaterialCardView>

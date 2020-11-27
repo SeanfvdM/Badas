@@ -2,6 +2,7 @@ package com.badas.badassolution;
 
 import com.badas.gamelibrary.ColorGame;
 import com.badas.gamelibrary.GameFragmentTemplate;
+import com.badas.gamelibrary.ShapeGame;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 public class GameState {
     public static final String Game_ColorGame = "ColorGame";
     public static final String Game_ShapeGame = "ShapeGame";
+    public static final String Game_CountGame = "CountingGame";
     private static GameState instance;
     private final HashMap<String, Class<? extends GameFragmentTemplate.GameView>> gamesList = new HashMap<>();
 
@@ -16,7 +18,8 @@ public class GameState {
         if (instance == null) {
             instance = new GameState();
             instance.gamesList.put(Game_ColorGame, ColorGame.class);
-            instance.gamesList.put(Game_ShapeGame, ColorGame.class);
+            instance.gamesList.put(Game_ShapeGame, ShapeGame.class);
+//            instance.gamesList.put(Game_CountGame, ColorGame.class);
         }
     }
 

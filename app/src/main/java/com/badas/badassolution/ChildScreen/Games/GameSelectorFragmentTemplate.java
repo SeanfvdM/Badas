@@ -33,15 +33,16 @@ public class GameSelectorFragmentTemplate extends Fragment {
     }
 
     View view;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_game_selector_template, container, false);
         TextView title = view.findViewById(R.id.tv_Title);
         title.setText(mTitle);
+        title.setTypeface(Settings.Font.getTypeface());
         TextView description = view.findViewById(R.id.tv_Description);
         description.setText(mDescription);
+        description.setTypeface(Settings.Font.getTypeface());
         if (mIcon != -1)
             ((ImageView) view.findViewById(R.id.iv_Icon)).setImageResource(mIcon);
         if (mColor != -1) {
@@ -50,8 +51,6 @@ public class GameSelectorFragmentTemplate extends Fragment {
             title.setTextColor(Settings.ColorCalculator.getTextColor(color));
             description.setTextColor(Settings.ColorCalculator.getTextColor(color));
         }
-        title.setTypeface(Settings.Font.getTypeface());
-        description.setTypeface(Settings.Font.getTypeface());
         return view;
     }
 

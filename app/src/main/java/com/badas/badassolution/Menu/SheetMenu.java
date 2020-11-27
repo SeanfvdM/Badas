@@ -1,6 +1,7 @@
 package com.badas.badassolution.Menu;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.badas.badassolution.R;
+import com.badas.badassolution.SplashScreen;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
 
@@ -56,6 +58,15 @@ public class SheetMenu extends BottomSheetDialogFragment {
                 }
                 menuAdapter.notifyDataSetChanged();
                 dismiss();
+            }
+        });
+
+        view.findViewById(R.id.fab_play).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(requireActivity(), SplashScreen.class);
+                SplashScreen.isChild = true;
+                startActivity(intent);
             }
         });
         return view;

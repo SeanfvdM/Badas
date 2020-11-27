@@ -18,9 +18,8 @@ import com.badas.login.LoginActivity;
 public class SplashScreen extends AppCompatActivity {
     CountDownTimer countDownTimer;
 
-    boolean isGeneral = false, isChild = true, isGuardian = false, skipLogin = false;
+    public static boolean isGeneral = true, isChild = false, isGuardian = false, skipLogin = false;
     boolean overrideFirebase = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +64,9 @@ public class SplashScreen extends AppCompatActivity {
                 GameState.init();
             } else if (isGeneral || isGuardian) {
                 Start(General.getInstance().getUserActivity());
+            } else {
+                Start(General.getInstance().getChildActivity());
+                GameState.init();
             }
         }
     }
@@ -107,6 +109,10 @@ public class SplashScreen extends AppCompatActivity {
                 Intent intent = new Intent(SplashScreen.this, cls);
                 if (cls == LoginActivity.class)
                     LoginActivity.setFrom(SplashScreen.class);
+                else if (cls == MainChildActivity.class && (isChild && (isGeneral || isGuardian))) {
+                    intent.setFlags(Intent.FLAG_ACTIVITY_LAUNCH_ADJACENT |
+                            Intent.FLAG_ACTIVITY_NEW_TASK);
+                }
 
                 ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat
                         .makeSceneTransitionAnimation(SplashScreen.this, findViewById(R.id.appLogo), "appLogo");

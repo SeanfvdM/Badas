@@ -93,7 +93,7 @@ public class MainActivity2 extends AppCompatActivity {
                 .addMenuItem(R.id.nav_student_result, R.drawable.ic_result_filter, getString(R.string.menu_student_result), 0)
                 .addMenuItem(R.id.nav_profile_manager, R.drawable.ic_work, getString(R.string.menu_profile_manager), 0)
                 .addMenuItem(R.id.nav_game_manager, R.drawable.ic_baseline_gamepad_24, getString(R.string.menu_game_manager), 0)
-                .addMenuItem(R.id.nav_game_template, R.drawable.ic_outline_bug_report_24, "Color Game (WIP)", 0)
+//                .addMenuItem(R.id.nav_game_template, R.drawable.ic_outline_bug_report_24, "Color Game (WIP)", 0)
                 .orderAsc()
                 .build();
 

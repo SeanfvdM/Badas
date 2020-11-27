@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline2"
         app:spanCount="2"
-        tools:itemCount="10"
+        tools:itemCount="4"
         tools:listitem="@layout/game_button_template" />
 
     <androidx.constraintlayout.widget.Guideline

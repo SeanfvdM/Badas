@@ -2,6 +2,7 @@ package com.badas.badassolution.ChildScreen;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,16 +12,17 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.badas.badasoptions.Settings;
 import com.badas.badassolution.ChildScreen.Games.GameSelectorFragmentTemplate;
 import com.badas.badassolution.GameState;
 import com.badas.badassolution.R;
 import com.badas.gamelibrary.GameFragmentTemplate;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class MainChildActivity extends AppCompatActivity {
-    private final HashMap<String, GameSelectorFragmentTemplate> gameSelectorFragments = new HashMap<>();
+    private final LinkedHashMap<String, GameSelectorFragmentTemplate> gameSelectorFragments = new LinkedHashMap<>();
     private final boolean endlessButtonNav = true;
     private ViewPager2 viewPager;
     private GameSelectorPagerAdapter pagerAdapter;
@@ -30,6 +32,10 @@ public class MainChildActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_child);
         hideSystemUI();
+        ((Button) findViewById(R.id.btn_forward)).setTypeface(Settings.Font.getTypeface());
+        ((Button) findViewById(R.id.btn_backward)).setTypeface(Settings.Font.getTypeface());
+        ((Button) findViewById(R.id.btn_play)).setTypeface(Settings.Font.getTypeface());
+
         gameSelectorFragments.put(GameState.Game_ColorGame,
                 new GameSelectorFragmentTemplate()
                         .setTitle("Color Matching")

@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.CallSuper;
@@ -16,6 +17,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.badas.badasoptions.Settings;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
@@ -63,6 +65,9 @@ public class GameFragmentTemplate extends Fragment {
         });
         tv_points = view.findViewById(R.id.tv_points);
         tv_levels = view.findViewById(R.id.tv_level);
+        tv_points.setTypeface(Settings.Font.getTypeface());
+        tv_levels.setTypeface(Settings.Font.getTypeface());
+        ((Button) view.findViewById(R.id.fab_done)).setTypeface(Settings.Font.getTypeface());
 
         mFragmentToLoad.pointsUpdated = new GameView.PointsUpdated() {
             @Override
@@ -167,6 +172,7 @@ public class GameFragmentTemplate extends Fragment {
 
             @Override
             public void onBindViewHolder(@NonNull GameViewHolder holder, int position) {
+                holder.button.setTypeface(Settings.Font.getTypeface());
                 importantEvents.onButtonBind(holder.button, position);
             }
 

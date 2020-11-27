@@ -59,4 +59,18 @@
         app:layout_constraintTop_toTopOf="parent"
         app:pressedTranslationZ="2dp" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_play"
+        style="@style/BadasTheme.FloatingActionButton.Menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/ic_baseline_gamepad_24"
+        app:borderWidth="0dp"
+        app:elevation="0dp"
+        app:fabSize="mini"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:pressedTranslationZ="2dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
