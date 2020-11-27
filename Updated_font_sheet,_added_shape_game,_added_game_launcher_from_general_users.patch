@@ -1,0 +1,798 @@
+Index: GameLibrary/src/main/java/com/badas/gamelibrary/LevelSelectionFragment.java
+===================================================================
+--- GameLibrary/src/main/java/com/badas/gamelibrary/LevelSelectionFragment.java	(revision 493ef1f4a52e066c16d0942aa1499e5cb4515cc4)
++++ GameLibrary/src/main/java/com/badas/gamelibrary/LevelSelectionFragment.java	(revision 493ef1f4a52e066c16d0942aa1499e5cb4515cc4)
+@@ -1,49 +0,0 @@
+-package com.badas.gamelibrary;
+-
+-import android.os.Bundle;
+-import android.view.LayoutInflater;
+-import android.view.View;
+-import android.view.ViewGroup;
+-
+-import androidx.annotation.NonNull;
+-import androidx.fragment.app.Fragment;
+-import androidx.recyclerview.widget.RecyclerView;
+-
+-public class LevelSelectionFragment extends Fragment {
+-    @Override
+-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+-                             Bundle savedInstanceState) {
+-        View view = inflater.inflate(R.layout.fragment_game_template, container, false);
+-        return view;
+-    }
+-}
+-
+-class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.LevelViewHolder> {
+-
+-    @NonNull
+-    @Override
+-    public LevelViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+-        View view = LayoutInflater.from(parent.getContext())
+-                .inflate(R.layout.card_level, parent, false);
+-        return new LevelViewHolder(view);
+-    }
+-
+-    @Override
+-    public void onBindViewHolder(@NonNull LevelViewHolder holder, int position) {
+-
+-    }
+-
+-    @Override
+-    public int getItemCount() {
+-        return 0;
+-    }
+-
+-    static class LevelViewHolder extends RecyclerView.ViewHolder {
+-
+-        public LevelViewHolder(@NonNull View itemView) {
+-            super(itemView);
+-        }
+-    }
+-
+-}
+-
+Index: GameLibrary/src/main/java/com/badas/gamelibrary/GameFragmentTemplate.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- GameLibrary/src/main/java/com/badas/gamelibrary/GameFragmentTemplate.java	(revision 493ef1f4a52e066c16d0942aa1499e5cb4515cc4)
++++ GameLibrary/src/main/java/com/badas/gamelibrary/GameFragmentTemplate.java	(date 1606470657761)
+@@ -6,6 +6,7 @@
+ import android.view.LayoutInflater;
+ import android.view.View;
+ import android.view.ViewGroup;
++import android.widget.Button;
+ import android.widget.TextView;
+ 
+ import androidx.annotation.CallSuper;
+@@ -16,6 +17,7 @@
+ import androidx.recyclerview.widget.GridLayoutManager;
+ import androidx.recyclerview.widget.RecyclerView;
+ 
++import com.badas.badasoptions.Settings;
+ import com.google.android.material.button.MaterialButton;
+ 
+ import java.util.ArrayList;
+@@ -63,6 +65,9 @@
+         });
+         tv_points = view.findViewById(R.id.tv_points);
+         tv_levels = view.findViewById(R.id.tv_level);
++        tv_points.setTypeface(Settings.Font.getTypeface());
++        tv_levels.setTypeface(Settings.Font.getTypeface());
++        ((Button) view.findViewById(R.id.fab_done)).setTypeface(Settings.Font.getTypeface());
+ 
+         mFragmentToLoad.pointsUpdated = new GameView.PointsUpdated() {
+             @Override
+@@ -167,6 +172,7 @@
+ 
+             @Override
+             public void onBindViewHolder(@NonNull GameViewHolder holder, int position) {
++                holder.button.setTypeface(Settings.Font.getTypeface());
+                 importantEvents.onButtonBind(holder.button, position);
+             }
+ 
+Index: app/src/main/java/com/badas/badassolution/Menu/SheetMenu.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/badas/badassolution/Menu/SheetMenu.java	(revision 493ef1f4a52e066c16d0942aa1499e5cb4515cc4)
++++ app/src/main/java/com/badas/badassolution/Menu/SheetMenu.java	(date 1606474457831)
+@@ -1,6 +1,7 @@
+ package com.badas.badassolution.Menu;
+ 
+ import android.content.DialogInterface;
++import android.content.Intent;
+ import android.content.res.Configuration;
+ import android.os.Bundle;
+ import android.view.LayoutInflater;
+@@ -16,6 +17,7 @@
+ import androidx.recyclerview.widget.RecyclerView;
+ 
+ import com.badas.badassolution.R;
++import com.badas.badassolution.SplashScreen;
+ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+ import com.google.android.material.button.MaterialButton;
+ 
+@@ -58,6 +60,15 @@
+                 dismiss();
+             }
+         });
++
++        view.findViewById(R.id.fab_play).setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                Intent intent = new Intent(requireActivity(), SplashScreen.class);
++                SplashScreen.isChild = true;
++                startActivity(intent);
++            }
++        });
+         return view;
+     }
+ 
+Index: GameLibrary/src/main/java/com/badas/gamelibrary/ColorGame.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- GameLibrary/src/main/java/com/badas/gamelibrary/ColorGame.java	(revision 493ef1f4a52e066c16d0942aa1499e5cb4515cc4)
++++ GameLibrary/src/main/java/com/badas/gamelibrary/ColorGame.java	(date 1606466641631)
+@@ -12,6 +12,7 @@
+ import androidx.annotation.NonNull;
+ import androidx.annotation.Nullable;
+ 
++import com.badas.badasoptions.Settings;
+ import com.badas.gamelibrary.GameFragmentTemplate.GameView;
+ import com.google.android.material.button.MaterialButton;
+ 
+@@ -137,10 +138,7 @@
+         }
+ 
+         int getForegroundColorValue() {
+-            double luminance = (0.2126 * color.red()
+-                    + 0.7152 * color.green()
+-                    + 0.0722 * color.blue());
+-            return (luminance < 0.140) ? Color.WHITE : Color.BLACK;
++            return Settings.ColorCalculator.getTextColor(color);
+         }
+ 
+         int getRippleColor() {
+Index: GameLibrary/src/main/java/com/badas/gamelibrary/ShapeGame.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- GameLibrary/src/main/java/com/badas/gamelibrary/ShapeGame.java	(date 1606474459608)
++++ GameLibrary/src/main/java/com/badas/gamelibrary/ShapeGame.java	(date 1606474459608)
+@@ -0,0 +1,173 @@
++package com.badas.gamelibrary;
++
++import android.content.res.ColorStateList;
++import android.graphics.Color;
++import android.os.Bundle;
++import android.view.LayoutInflater;
++import android.view.View;
++import android.view.ViewGroup;
++import android.widget.ImageView;
++import android.widget.Toast;
++
++import androidx.annotation.DrawableRes;
++import androidx.annotation.NonNull;
++import androidx.annotation.Nullable;
++import androidx.core.content.ContextCompat;
++
++import com.badas.badasoptions.Settings;
++import com.badas.gamelibrary.GameFragmentTemplate.GameView;
++import com.google.android.material.button.MaterialButton;
++
++import java.util.ArrayList;
++import java.util.List;
++import java.util.Random;
++
++/**
++ * Project: BadasSolution
++ * By: Seanf
++ * Created: 28,October,2020
++ */
++public class ShapeGame extends GameView {
++    ImageView display;
++    List<ShapeData> shapeList = new ArrayList<>();
++    private ShapeData correctColor;
++
++    @Nullable
++    @Override
++    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
++        View view = inflater.inflate(R.layout.shape_layout, container, false);
++        display = view.findViewById(R.id.shapeDisplay);
++        return view;
++    }
++
++    private void setCorrectColor() {
++        //the range of the random
++        float min = 0, max = 100;
++        //the percentile of each index i.e.
++        //for 4 values with a range of 0-100:
++        //0-24 = 0, 25-49 = 1, 50-74 = 2, 75-100 = 3
++        float percentile = (max - min) / shapeList.size();
++        float random = min + new Random().nextFloat() * (max - min);
++        int counter = 1;
++
++        while (counter <= shapeList.size()) {
++            if (percentile * counter > random) {
++                if (correctColor != shapeList.get(counter - 1)) {
++                    correctColor = shapeList.get(counter - 1);
++                    break;
++                } else
++                    setCorrectColor();
++            }
++            counter++;
++        }
++    }
++
++    @Override
++    public void onResume() {
++        super.onResume();
++        currentLevel = 0;
++        updateGame();
++    }
++
++    private void updateGame() {
++        setCorrectColor();
++        display.setImageResource(correctColor.getShape());
++        currentLevel++;
++        pointsUpdated.onLevelChanged(currentLevel);
++    }
++
++    @Override
++    GameAdapter<?> getGameAdapter() {
++        shapeList.clear();
++        //todo swap the order or the colors
++        shapeList.add(new ShapeData(R.drawable.ic_rectangle, Color.valueOf(Color.BLUE), "Square"));
++        shapeList.add(new ShapeData(R.drawable.ic_triangle, Color.valueOf(Color.YELLOW), "Triangle"));
++        shapeList.add(new ShapeData(R.drawable.ic_circle, Color.valueOf(Color.RED), "Circle"));
++        shapeList.add(new ShapeData(R.drawable.ic_diamond, Color.valueOf(Color.GREEN), "Diamond"));
++
++        importantEvents = new ImportantEvents() {
++            @Override
++            public void onButtonBind(MaterialButton button, int position) {
++                button.setText(shapeList.get(position).getShapeText());
++                button.setBackground(ContextCompat.getDrawable(requireContext(), shapeList.get(position).getShape()));
++                button.setTextColor(Settings.ColorCalculator.getTextColor(Color.valueOf(requireContext().getColor(R.color.colorBackground))));
++                button.setMinHeight(200);
++                button.setMinWidth(200);
++//                button.setBackgroundColor(shapeList.get(position).getColorValue()); //breaks everything
++                button.setRippleColor(new ColorStateList(
++                        new int[][]{
++                                new int[]{android.R.attr.state_pressed},
++                        },
++                        new int[]{
++                                shapeList.get(position).getRippleColor(),
++                        }
++                ));
++
++                button.setOnClickListener(new View.OnClickListener() {
++                    @Override
++                    public void onClick(View v) {
++                        if (shapeList.get(position).equals(correctColor)) {
++                            Toast.makeText(requireContext(), "Correct", Toast.LENGTH_SHORT).show();
++                            currentPoints++;
++                            pointsUpdated.onPointsChanged(currentPoints);
++                            updateGame();
++                        }
++                    }
++                });
++            }
++        };
++        GameAdapter<ShapeData> shapeGameAdapter = new GameAdapter<>();
++        shapeGameAdapter.setDataSet(shapeList);
++        return shapeGameAdapter;
++    }
++
++    @Override
++    GameView init() {
++        setUI(true, true);
++        currentLevel = 1;
++        currentPoints = 0;
++        return this;
++    }
++
++    static class ShapeData {
++        Color color;
++        @DrawableRes
++        int shape;
++        String shapeText;
++
++        public ShapeData(@DrawableRes int shape, Color color, String shapeText) {
++            this.color = color;
++            this.shapeText = shapeText;
++            this.shape = shape;
++        }
++
++        public @DrawableRes
++        int getShape() {
++            return shape;
++        }
++
++        Color getForegroundColor() {
++            return Color.valueOf(getForegroundColorValue());
++        }
++
++        int getForegroundColorValue() {
++            return Settings.ColorCalculator.getTextColor(color);
++        }
++
++        int getRippleColor() {
++            return Color.valueOf(getForegroundColor().luminance(), getForegroundColor().red(), getForegroundColor().green(), getForegroundColor().blue()).toArgb();
++        }
++
++        public Color getColor() {
++            return color;
++        }
++
++        public int getColorValue() {
++            return color.toArgb();
++        }
++
++        public String getShapeText() {
++            return shapeText;
++        }
++    }
++}
+Index: app/src/main/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/AndroidManifest.xml	(revision 493ef1f4a52e066c16d0942aa1499e5cb4515cc4)
++++ app/src/main/AndroidManifest.xml	(date 1606467363185)
+@@ -22,6 +22,7 @@
+             android:name=".MainActivity2"
+             android:label="@string/app_name"
+             android:launchMode="singleTask"
++            android:screenOrientation="sensorPortrait"
+             android:theme="@style/BadasTheme.NoActionBar">
+             <intent-filter>
+                 <action android:name="android.intent.action.MAIN" />
+@@ -30,7 +31,7 @@
+         <activity
+             android:name=".SplashScreen"
+             android:launchMode="singleTask"
+-            android:screenOrientation="portrait"
++            android:screenOrientation="sensorPortrait"
+             android:theme="@style/BadasTheme.Splash">
+             <intent-filter>
+                 <category android:name="android.intent.category.LAUNCHER" />
+@@ -42,6 +43,7 @@
+             android:name=".MainActivity"
+             android:label="@string/app_name"
+             android:launchMode="singleTask"
++            android:screenOrientation="sensorLandscape"
+             android:theme="@style/BadasTheme.NoActionBar">
+             <intent-filter>
+                 <action android:name="android.intent.action.MAIN" />
+Index: app/src/main/java/com/badas/badassolution/GameState.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/badas/badassolution/GameState.java	(revision 493ef1f4a52e066c16d0942aa1499e5cb4515cc4)
++++ app/src/main/java/com/badas/badassolution/GameState.java	(date 1606466821282)
+@@ -2,6 +2,7 @@
+ 
+ import com.badas.gamelibrary.ColorGame;
+ import com.badas.gamelibrary.GameFragmentTemplate;
++import com.badas.gamelibrary.ShapeGame;
+ 
+ import java.lang.reflect.InvocationTargetException;
+ import java.util.HashMap;
+@@ -9,6 +10,7 @@
+ public class GameState {
+     public static final String Game_ColorGame = "ColorGame";
+     public static final String Game_ShapeGame = "ShapeGame";
++    public static final String Game_CountGame = "CountingGame";
+     private static GameState instance;
+     private final HashMap<String, Class<? extends GameFragmentTemplate.GameView>> gamesList = new HashMap<>();
+ 
+@@ -16,7 +18,8 @@
+         if (instance == null) {
+             instance = new GameState();
+             instance.gamesList.put(Game_ColorGame, ColorGame.class);
+-            instance.gamesList.put(Game_ShapeGame, ColorGame.class);
++            instance.gamesList.put(Game_ShapeGame, ShapeGame.class);
++//            instance.gamesList.put(Game_CountGame, ColorGame.class);
+         }
+     }
+ 
+Index: app/src/main/java/com/badas/badassolution/ChildScreen/Games/GameSelectorFragmentTemplate.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/badas/badassolution/ChildScreen/Games/GameSelectorFragmentTemplate.java	(revision 493ef1f4a52e066c16d0942aa1499e5cb4515cc4)
++++ app/src/main/java/com/badas/badassolution/ChildScreen/Games/GameSelectorFragmentTemplate.java	(date 1606474457848)
+@@ -33,15 +33,16 @@
+     }
+ 
+     View view;
+-
+     @Override
+     public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                              Bundle savedInstanceState) {
+         view = inflater.inflate(R.layout.fragment_game_selector_template, container, false);
+         TextView title = view.findViewById(R.id.tv_Title);
+         title.setText(mTitle);
++        title.setTypeface(Settings.Font.getTypeface());
+         TextView description = view.findViewById(R.id.tv_Description);
+         description.setText(mDescription);
++        description.setTypeface(Settings.Font.getTypeface());
+         if (mIcon != -1)
+             ((ImageView) view.findViewById(R.id.iv_Icon)).setImageResource(mIcon);
+         if (mColor != -1) {
+@@ -50,8 +51,6 @@
+             title.setTextColor(Settings.ColorCalculator.getTextColor(color));
+             description.setTextColor(Settings.ColorCalculator.getTextColor(color));
+         }
+-        title.setTypeface(Settings.Font.getTypeface());
+-        description.setTypeface(Settings.Font.getTypeface());
+         return view;
+     }
+ 
+Index: app/src/main/res/layout/fragment_placeholder.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/fragment_placeholder.xml	(revision 493ef1f4a52e066c16d0942aa1499e5cb4515cc4)
++++ app/src/main/res/layout/fragment_placeholder.xml	(date 1606467891971)
+@@ -26,6 +26,7 @@
+         android:layout_height="wrap_content"
+         android:layout_marginTop="16dp"
+         android:text="Show font dialog"
++        android:visibility="gone"
+         app:layout_constraintEnd_toEndOf="parent"
+         app:layout_constraintStart_toStartOf="parent"
+         app:layout_constraintTop_toBottomOf="@+id/text_placeholder" />
+@@ -36,6 +37,7 @@
+         android:layout_height="wrap_content"
+         android:layout_marginTop="8dp"
+         android:text="Show font sheet"
++        android:visibility="gone"
+         app:layout_constraintEnd_toEndOf="parent"
+         app:layout_constraintStart_toStartOf="parent"
+         app:layout_constraintTop_toBottomOf="@+id/font_button" />
+Index: app/src/main/res/layout/sheet_menu.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/sheet_menu.xml	(revision 493ef1f4a52e066c16d0942aa1499e5cb4515cc4)
++++ app/src/main/res/layout/sheet_menu.xml	(date 1606466176681)
+@@ -59,4 +59,18 @@
+         app:layout_constraintTop_toTopOf="parent"
+         app:pressedTranslationZ="2dp" />
+ 
++    <com.google.android.material.floatingactionbutton.FloatingActionButton
++        android:id="@+id/fab_play"
++        style="@style/BadasTheme.FloatingActionButton.Menu"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:layout_marginStart="16dp"
++        android:src="@drawable/ic_baseline_gamepad_24"
++        app:borderWidth="0dp"
++        app:elevation="0dp"
++        app:fabSize="mini"
++        app:layout_constraintStart_toStartOf="parent"
++        app:layout_constraintTop_toTopOf="parent"
++        app:pressedTranslationZ="2dp" />
++
+ </androidx.constraintlayout.widget.ConstraintLayout>
+\ No newline at end of file
+Index: GameLibrary/src/main/res/layout/fragment_game_template.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- GameLibrary/src/main/res/layout/fragment_game_template.xml	(revision 493ef1f4a52e066c16d0942aa1499e5cb4515cc4)
++++ GameLibrary/src/main/res/layout/fragment_game_template.xml	(date 1606469034366)
+@@ -16,7 +16,7 @@
+         app:layout_constraintStart_toStartOf="parent"
+         app:layout_constraintTop_toTopOf="@+id/guideline2"
+         app:spanCount="2"
+-        tools:itemCount="10"
++        tools:itemCount="4"
+         tools:listitem="@layout/game_button_template" />
+ 
+     <androidx.constraintlayout.widget.Guideline
+Index: GameLibrary/src/main/res/drawable/ic_circle.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- GameLibrary/src/main/res/drawable/ic_circle.xml	(date 1606474459593)
++++ GameLibrary/src/main/res/drawable/ic_circle.xml	(date 1606474459593)
+@@ -0,0 +1,9 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="24dp"
++    android:height="24dp"
++    android:viewportWidth="24"
++    android:viewportHeight="24">
++    <path
++        android:fillColor="#ff0000"
++        android:pathData="M12,12m-12,0a12,12 0,1 1,24 0a12,12 0,1 1,-24 0" />
++</vector>
+Index: app/src/main/java/com/badas/badassolution/MainActivity2.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/badas/badassolution/MainActivity2.java	(revision 493ef1f4a52e066c16d0942aa1499e5cb4515cc4)
++++ app/src/main/java/com/badas/badassolution/MainActivity2.java	(date 1606466277564)
+@@ -93,7 +93,7 @@
+                 .addMenuItem(R.id.nav_student_result, R.drawable.ic_result_filter, getString(R.string.menu_student_result), 0)
+                 .addMenuItem(R.id.nav_profile_manager, R.drawable.ic_work, getString(R.string.menu_profile_manager), 0)
+                 .addMenuItem(R.id.nav_game_manager, R.drawable.ic_baseline_gamepad_24, getString(R.string.menu_game_manager), 0)
+-                .addMenuItem(R.id.nav_game_template, R.drawable.ic_outline_bug_report_24, "Color Game (WIP)", 0)
++//                .addMenuItem(R.id.nav_game_template, R.drawable.ic_outline_bug_report_24, "Color Game (WIP)", 0)
+                 .orderAsc()
+                 .build();
+ 
+Index: GameLibrary/src/main/res/layout/game_button_template.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- GameLibrary/src/main/res/layout/game_button_template.xml	(revision 493ef1f4a52e066c16d0942aa1499e5cb4515cc4)
++++ GameLibrary/src/main/res/layout/game_button_template.xml	(date 1606470441342)
+@@ -1,9 +1,12 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <com.google.android.material.button.MaterialButton xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:tools="http://schemas.android.com/tools"
+     android:id="@+id/gameButton"
+-    android:layout_width="match_parent"
++    android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+-    android:layout_marginHorizontal="4dp"
+     android:layout_gravity="center"
+-    android:layout_marginVertical="0dp"
+-    android:minHeight="64dip" />
+\ No newline at end of file
++    android:layout_marginHorizontal="4dp"
++    android:layout_marginVertical="4dp"
++    android:minHeight="100dp"
++    android:textSize="32sp"
++    tools:text="test" />
+\ No newline at end of file
+Index: GameLibrary/src/main/res/drawable/ic_rectangle.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- GameLibrary/src/main/res/drawable/ic_rectangle.xml	(date 1606474459470)
++++ GameLibrary/src/main/res/drawable/ic_rectangle.xml	(date 1606474459470)
+@@ -0,0 +1,9 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="24dp"
++    android:height="24dp"
++    android:viewportWidth="24"
++    android:viewportHeight="24">
++    <path
++        android:fillColor="#0000FF"
++        android:pathData="M0,0h24v24h-24z" />
++</vector>
+Index: app/src/main/res/drawable/ic_baseline_gamepad_24.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/drawable/ic_baseline_gamepad_24.xml	(date 1606474459437)
++++ app/src/main/res/drawable/ic_baseline_gamepad_24.xml	(date 1606474459437)
+@@ -0,0 +1,10 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="24dp"
++    android:height="24dp"
++    android:tint="?attr/colorControlNormal"
++    android:viewportWidth="24"
++    android:viewportHeight="24">
++    <path
++        android:fillColor="@android:color/white"
++        android:pathData="M15,7.5V2H9v5.5l3,3 3,-3zM7.5,9H2v6h5.5l3,-3 -3,-3zM9,16.5V22h6v-5.5l-3,-3 -3,3zM16.5,9l-3,3 3,3H22V9h-5.5z" />
++</vector>
+Index: GameLibrary/src/main/res/drawable/ic_diamond.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- GameLibrary/src/main/res/drawable/ic_diamond.xml	(date 1606474459547)
++++ GameLibrary/src/main/res/drawable/ic_diamond.xml	(date 1606474459547)
+@@ -0,0 +1,9 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="24dp"
++    android:height="24dp"
++    android:viewportWidth="24"
++    android:viewportHeight="24">
++    <path
++        android:fillColor="#00FF00"
++        android:pathData="M12,0L24,12L12,24L0,12L12,0Z" />
++</vector>
+Index: GameLibrary/src/main/res/layout/shape_layout.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- GameLibrary/src/main/res/layout/shape_layout.xml	(date 1606471039910)
++++ GameLibrary/src/main/res/layout/shape_layout.xml	(date 1606471039910)
+@@ -0,0 +1,17 @@
++<?xml version="1.0" encoding="utf-8"?>
++<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:tools="http://schemas.android.com/tools"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent"
++    android:animateLayoutChanges="true">
++
++    <ImageView
++        android:id="@+id/shapeDisplay"
++        android:layout_width="match_parent"
++        android:layout_height="match_parent"
++        android:padding="8dp"
++        android:scaleType="fitCenter"
++        android:tint="@color/colorPrimary"
++        tools:context=".GameFragmentTemplate"
++        tools:src="@drawable/ic_circle" />
++</androidx.constraintlayout.widget.ConstraintLayout>
+\ No newline at end of file
+Index: app/src/main/java/com/badas/badassolution/SplashScreen.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/badas/badassolution/SplashScreen.java	(revision 493ef1f4a52e066c16d0942aa1499e5cb4515cc4)
++++ app/src/main/java/com/badas/badassolution/SplashScreen.java	(date 1606474459487)
+@@ -18,10 +18,9 @@
+ public class SplashScreen extends AppCompatActivity {
+     CountDownTimer countDownTimer;
+ 
+-    boolean isGeneral = false, isChild = true, isGuardian = false, skipLogin = false;
++    public static boolean isGeneral = true, isChild = false, isGuardian = false, skipLogin = false;
+     boolean overrideFirebase = false;
+ 
+-
+     @Override
+     protected void onCreate(Bundle savedInstanceState) {
+         super.onCreate(savedInstanceState);
+@@ -65,6 +64,9 @@
+                 GameState.init();
+             } else if (isGeneral || isGuardian) {
+                 Start(General.getInstance().getUserActivity());
++            } else {
++                Start(General.getInstance().getChildActivity());
++                GameState.init();
+             }
+         }
+     }
+@@ -107,6 +109,10 @@
+                 Intent intent = new Intent(SplashScreen.this, cls);
+                 if (cls == LoginActivity.class)
+                     LoginActivity.setFrom(SplashScreen.class);
++                else if (cls == MainChildActivity.class && (isChild && (isGeneral || isGuardian))) {
++                    intent.setFlags(Intent.FLAG_ACTIVITY_LAUNCH_ADJACENT |
++                            Intent.FLAG_ACTIVITY_NEW_TASK);
++                }
+ 
+                 ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat
+                         .makeSceneTransitionAnimation(SplashScreen.this, findViewById(R.id.appLogo), "appLogo");
+Index: GameLibrary/src/main/res/layout-land/fragment_game_template.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- GameLibrary/src/main/res/layout-land/fragment_game_template.xml	(revision 493ef1f4a52e066c16d0942aa1499e5cb4515cc4)
++++ GameLibrary/src/main/res/layout-land/fragment_game_template.xml	(date 1606470138797)
+@@ -19,7 +19,7 @@
+         app:layout_constraintStart_toStartOf="@+id/guideline3"
+         app:layout_constraintTop_toBottomOf="@+id/ll_levels"
+         app:spanCount="2"
+-        tools:itemCount="10"
++        tools:itemCount="4"
+         tools:listitem="@layout/game_button_template" />
+ 
+     <com.google.android.material.card.MaterialCardView
+Index: GameLibrary/src/main/res/drawable/ic_triangle.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- GameLibrary/src/main/res/drawable/ic_triangle.xml	(date 1606474459669)
++++ GameLibrary/src/main/res/drawable/ic_triangle.xml	(date 1606474459669)
+@@ -0,0 +1,9 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="22dp"
++    android:height="18dp"
++    android:viewportWidth="22"
++    android:viewportHeight="18">
++    <path
++        android:fillColor="#FFFF00"
++        android:pathData="M11,0L21.3923,18H0.6077L11,0Z" />
++</vector>
+Index: app/src/main/java/com/badas/badassolution/ChildScreen/MainChildActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/badas/badassolution/ChildScreen/MainChildActivity.java	(revision 493ef1f4a52e066c16d0942aa1499e5cb4515cc4)
++++ app/src/main/java/com/badas/badassolution/ChildScreen/MainChildActivity.java	(date 1606474457864)
+@@ -2,6 +2,7 @@
+ 
+ import android.os.Bundle;
+ import android.view.View;
++import android.widget.Button;
+ 
+ import androidx.annotation.NonNull;
+ import androidx.appcompat.app.AppCompatActivity;
+@@ -11,16 +12,17 @@
+ import androidx.viewpager2.adapter.FragmentStateAdapter;
+ import androidx.viewpager2.widget.ViewPager2;
+ 
++import com.badas.badasoptions.Settings;
+ import com.badas.badassolution.ChildScreen.Games.GameSelectorFragmentTemplate;
+ import com.badas.badassolution.GameState;
+ import com.badas.badassolution.R;
+ import com.badas.gamelibrary.GameFragmentTemplate;
+ 
+ import java.lang.reflect.InvocationTargetException;
+-import java.util.HashMap;
++import java.util.LinkedHashMap;
+ 
+ public class MainChildActivity extends AppCompatActivity {
+-    private final HashMap<String, GameSelectorFragmentTemplate> gameSelectorFragments = new HashMap<>();
++    private final LinkedHashMap<String, GameSelectorFragmentTemplate> gameSelectorFragments = new LinkedHashMap<>();
+     private final boolean endlessButtonNav = true;
+     private ViewPager2 viewPager;
+     private GameSelectorPagerAdapter pagerAdapter;
+@@ -30,6 +32,10 @@
+         super.onCreate(savedInstanceState);
+         setContentView(R.layout.activity_main_child);
+         hideSystemUI();
++        ((Button) findViewById(R.id.btn_forward)).setTypeface(Settings.Font.getTypeface());
++        ((Button) findViewById(R.id.btn_backward)).setTypeface(Settings.Font.getTypeface());
++        ((Button) findViewById(R.id.btn_play)).setTypeface(Settings.Font.getTypeface());
++
+         gameSelectorFragments.put(GameState.Game_ColorGame,
+                 new GameSelectorFragmentTemplate()
+                         .setTitle("Color Matching")
+Index: BadasManager/src/main/res/layout/font_bottomsheet.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- BadasManager/src/main/res/layout/font_bottomsheet.xml	(revision 493ef1f4a52e066c16d0942aa1499e5cb4515cc4)
++++ BadasManager/src/main/res/layout/font_bottomsheet.xml	(date 1606467796981)
+@@ -3,7 +3,9 @@
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     xmlns:tools="http://schemas.android.com/tools"
+     android:layout_width="match_parent"
+-    android:layout_height="match_parent">
++    android:layout_height="match_parent"
++    android:background="@color/colorBackground"
++    android:theme="@style/BadasTheme">
+ 
+     <LinearLayout
+         android:layout_width="match_parent"
+@@ -92,6 +94,7 @@
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="8dp"
+                 android:padding="4dp"
++                app:cardBackgroundColor="@color/background_lighter"
+                 app:cardElevation="0dp"
+                 app:layout_constraintEnd_toEndOf="parent"
+                 app:layout_constraintHorizontal_bias="0.0"
+@@ -107,7 +110,7 @@
+                     android:padding="16dp"
+                     android:text="@string/loading_fonts"
+                     android:textAlignment="center"
+-                    android:textColor="?attr/colorOnSecondary"
++                    android:textColor="@color/colorOnSurface"
+                     android:textSize="18sp" />
+ 
+             </com.google.android.material.card.MaterialCardView>
