@@ -68,6 +68,8 @@ public class GameFragmentTemplate extends Fragment {
         tv_points.setTypeface(Settings.Font.getTypeface());
         tv_levels.setTypeface(Settings.Font.getTypeface());
         ((Button) view.findViewById(R.id.fab_done)).setTypeface(Settings.Font.getTypeface());
+        ((TextView) view.findViewById(R.id.textView3)).setTypeface(Settings.Font.getTypeface());
+        ((TextView) view.findViewById(R.id.textView5)).setTypeface(Settings.Font.getTypeface());
 
         mFragmentToLoad.pointsUpdated = new GameView.PointsUpdated() {
             @Override

@@ -1,6 +1,7 @@
 package com.badas.badassolution;
 
 import com.badas.gamelibrary.ColorGame;
+import com.badas.gamelibrary.CountingGame;
 import com.badas.gamelibrary.GameFragmentTemplate;
 import com.badas.gamelibrary.ShapeGame;
 
@@ -19,7 +20,7 @@ public class GameState {
             instance = new GameState();
             instance.gamesList.put(Game_ColorGame, ColorGame.class);
             instance.gamesList.put(Game_ShapeGame, ShapeGame.class);
-//            instance.gamesList.put(Game_CountGame, ColorGame.class);
+            instance.gamesList.put(Game_CountGame, CountingGame.class);
         }
     }
 

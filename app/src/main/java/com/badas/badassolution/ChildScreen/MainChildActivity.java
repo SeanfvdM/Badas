@@ -19,10 +19,10 @@ import com.badas.badassolution.R;
 import com.badas.gamelibrary.GameFragmentTemplate;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 
 public class MainChildActivity extends AppCompatActivity {
-    private final LinkedHashMap<String, GameSelectorFragmentTemplate> gameSelectorFragments = new LinkedHashMap<>();
+    private final HashMap<String, GameSelectorFragmentTemplate> gameSelectorFragments = new HashMap<>();
     private final boolean endlessButtonNav = true;
     private ViewPager2 viewPager;
     private GameSelectorPagerAdapter pagerAdapter;
@@ -47,6 +47,12 @@ public class MainChildActivity extends AppCompatActivity {
                         .setTitle("Shape Matching")
                         .setDescription("[Placeholder]Match the large shape tile to the correct smaller tile.")
                         .setIcon(R.drawable.ic_shapes_and_colors)
+                        .setColor(getResources().getColor(R.color.blue, getTheme())));
+        gameSelectorFragments.put(GameState.Game_CountGame,
+                new GameSelectorFragmentTemplate()
+                        .setTitle("Counting")
+                        .setDescription("[Placeholder]Match the total words or image to the number\n(Note) First level does not load the images")
+                        .setIcon(R.drawable.ic_count)
                         .setColor(getResources().getColor(R.color.green, getTheme())));
 
         viewPager = findViewById(R.id.pager);
@@ -79,7 +85,7 @@ public class MainChildActivity extends AppCompatActivity {
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 GameFragmentTemplate gameFragmentTemplate = null;
                 try {
-                    gameFragmentTemplate = GameState.getGame(pagerAdapter.getCurrentScreen(), new GameFragmentTemplate.GameCallback() {
+                    gameFragmentTemplate = GameState.getGame(gameSelectorFragments.keySet().toArray()[viewPager.getCurrentItem()].toString(), new GameFragmentTemplate.GameCallback() {
                         @Override
                         public void parentCalled(AppCompatActivity compatActivity) {
                             super.parentCalled(compatActivity);//todo add stuff here
@@ -146,6 +152,11 @@ public class MainChildActivity extends AppCompatActivity {
         @NonNull
         @Override
         public Fragment createFragment(int position) {
+            currentScreen = gameSelectorFragments.keySet().toArray()[position].toString();
+            return gameSelectorFragments.get(currentScreen);
+        }
+
+        public Fragment getFragment(int position) {
             currentScreen = gameSelectorFragments.keySet().toArray()[position].toString();
             return gameSelectorFragments.get(currentScreen);
         }
