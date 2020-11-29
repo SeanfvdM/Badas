@@ -1,6 +1,7 @@
 package com.badas.badassolution.ChildScreen;
 
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 
@@ -25,7 +26,6 @@ public class MainChildActivity extends AppCompatActivity {
     private final HashMap<String, GameSelectorFragmentTemplate> gameSelectorFragments = new HashMap<>();
     private final boolean endlessButtonNav = true;
     private ViewPager2 viewPager;
-    private GameSelectorPagerAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +33,11 @@ public class MainChildActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_child);
         hideSystemUI();
         ((Button) findViewById(R.id.btn_forward)).setTypeface(Settings.Font.getTypeface());
+        ((Button) findViewById(R.id.btn_forward)).setTextSize(TypedValue.COMPLEX_UNIT_SP, Settings.Font.getFontSize());
         ((Button) findViewById(R.id.btn_backward)).setTypeface(Settings.Font.getTypeface());
+        ((Button) findViewById(R.id.btn_backward)).setTextSize(TypedValue.COMPLEX_UNIT_SP, Settings.Font.getFontSize());
         ((Button) findViewById(R.id.btn_play)).setTypeface(Settings.Font.getTypeface());
+        ((Button) findViewById(R.id.btn_play)).setTextSize(TypedValue.COMPLEX_UNIT_SP, Settings.Font.getFontSize());
 
         gameSelectorFragments.put(GameState.Game_ColorGame,
                 new GameSelectorFragmentTemplate()
@@ -56,7 +59,7 @@ public class MainChildActivity extends AppCompatActivity {
                         .setColor(getResources().getColor(R.color.green, getTheme())));
 
         viewPager = findViewById(R.id.pager);
-        pagerAdapter = new GameSelectorPagerAdapter(this);
+        GameSelectorPagerAdapter pagerAdapter = new GameSelectorPagerAdapter(this);
         viewPager.setAdapter(pagerAdapter);
 
         findViewById(R.id.btn_forward).setOnClickListener(new View.OnClickListener() {

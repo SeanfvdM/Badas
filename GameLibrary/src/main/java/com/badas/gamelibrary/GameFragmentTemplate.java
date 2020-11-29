@@ -3,6 +3,7 @@ package com.badas.gamelibrary;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,10 +67,15 @@ public class GameFragmentTemplate extends Fragment {
         tv_points = view.findViewById(R.id.tv_points);
         tv_levels = view.findViewById(R.id.tv_level);
         tv_points.setTypeface(Settings.Font.getTypeface());
+        tv_points.setTextSize(TypedValue.COMPLEX_UNIT_SP, Settings.Font.getFontSize());
         tv_levels.setTypeface(Settings.Font.getTypeface());
+        tv_levels.setTextSize(TypedValue.COMPLEX_UNIT_SP, Settings.Font.getFontSize());
         ((Button) view.findViewById(R.id.fab_done)).setTypeface(Settings.Font.getTypeface());
+        ((Button) view.findViewById(R.id.fab_done)).setTextSize(TypedValue.COMPLEX_UNIT_SP, Settings.Font.getFontSize());
         ((TextView) view.findViewById(R.id.textView3)).setTypeface(Settings.Font.getTypeface());
+        ((TextView) view.findViewById(R.id.textView3)).setTextSize(TypedValue.COMPLEX_UNIT_SP, Settings.Font.getFontSize());
         ((TextView) view.findViewById(R.id.textView5)).setTypeface(Settings.Font.getTypeface());
+        ((TextView) view.findViewById(R.id.textView5)).setTextSize(TypedValue.COMPLEX_UNIT_SP, Settings.Font.getFontSize());
 
         mFragmentToLoad.pointsUpdated = new GameView.PointsUpdated() {
             @Override
@@ -175,6 +181,7 @@ public class GameFragmentTemplate extends Fragment {
             @Override
             public void onBindViewHolder(@NonNull GameViewHolder holder, int position) {
                 holder.button.setTypeface(Settings.Font.getTypeface());
+                holder.button.setTextSize(TypedValue.COMPLEX_UNIT_SP, Settings.Font.getFontSize());
                 importantEvents.onButtonBind(holder.button, position);
             }
 

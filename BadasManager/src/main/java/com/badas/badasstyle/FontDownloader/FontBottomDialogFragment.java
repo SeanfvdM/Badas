@@ -81,7 +81,7 @@ public class FontBottomDialogFragment extends BottomSheetDialogFragment {
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
 
-        Slider slider = view.findViewById(R.id.fontSize);
+        final Slider slider = view.findViewById(R.id.fontSize);
         if (showRelativeFS) {
             view.findViewById(R.id.tv_deviceFontData).setVisibility(View.VISIBLE);
             ((TextView) view.findViewById(R.id.tv_deviceFontData))
@@ -207,7 +207,7 @@ public class FontBottomDialogFragment extends BottomSheetDialogFragment {
             public void onClick(View v) {
                 selectedFont.setTypeface(selectedTypeface);
                 try {
-                    fontListener.onFontSelectedListener(selectedVariant, selectedFont, selectedTypeface);
+                    fontListener.onFontSelectedListener(selectedVariant, selectedFont, selectedTypeface, Math.round(slider.getValue()));
                 } catch (Exception ignored) {
 
                 }
@@ -397,6 +397,6 @@ public class FontBottomDialogFragment extends BottomSheetDialogFragment {
     }
 
     public interface FontListener {
-        void onFontSelectedListener(String lastSelectedFontVariant, Font lastSelectedFont, Typeface lastSelectedTypeface);
+        void onFontSelectedListener(String lastSelectedFontVariant, Font lastSelectedFont, Typeface lastSelectedTypeface, int size);
     }
 }

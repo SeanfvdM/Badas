@@ -25,7 +25,7 @@
                 android:stepSize="1"
                 android:value="30.0"
                 android:valueFrom="1.0"
-                android:valueTo="100.0"
+                android:valueTo="52.0"
                 app:labelBehavior="floating"
                 app:layout_constraintEnd_toStartOf="@+id/fontSizeText"
                 app:layout_constraintStart_toStartOf="parent"

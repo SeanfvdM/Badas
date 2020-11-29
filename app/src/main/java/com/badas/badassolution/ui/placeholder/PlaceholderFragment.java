@@ -35,19 +35,11 @@ public class PlaceholderFragment extends Fragment {
                         .showRelativeFontSize();
         fontBottomDialogFragment.setFontListener(new FontBottomDialogFragment.FontListener() {
             @Override
-            public void onFontSelectedListener(String lastSelectedFontVariant, Font lastSelectedFont, Typeface lastSelectedTypeface) {
+            public void onFontSelectedListener(String lastSelectedFontVariant, Font lastSelectedFont, Typeface lastSelectedTypeface, int size) {
                 Toast.makeText(requireContext(), lastSelectedFont.getFamily(), Toast.LENGTH_SHORT).show();
 
                 Settings.Font.setSelectedFont(lastSelectedFont);
-                Settings.Font.storeFont(lastSelectedFontVariant);
-            }
-        });
-
-        Button button = root.findViewById(R.id.font_button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FontDialogFragment.display(getChildFragmentManager());
+                Settings.Font.storeFont(lastSelectedFontVariant, size);
             }
         });
 
@@ -56,6 +48,14 @@ public class PlaceholderFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 fontBottomDialogFragment.show(getChildFragmentManager(), "Fonts");
+            }
+        });
+
+        Button button = root.findViewById(R.id.font_button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FontDialogFragment.display(getChildFragmentManager());
             }
         });
 

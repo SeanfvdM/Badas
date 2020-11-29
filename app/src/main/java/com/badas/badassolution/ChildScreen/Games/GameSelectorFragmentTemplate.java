@@ -2,6 +2,7 @@ package com.badas.badassolution.ChildScreen.Games;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,9 +41,11 @@ public class GameSelectorFragmentTemplate extends Fragment {
         TextView title = view.findViewById(R.id.tv_Title);
         title.setText(mTitle);
         title.setTypeface(Settings.Font.getTypeface());
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, Settings.Font.getFontSize());
         TextView description = view.findViewById(R.id.tv_Description);
         description.setText(mDescription);
         description.setTypeface(Settings.Font.getTypeface());
+        description.setTextSize(TypedValue.COMPLEX_UNIT_SP, Settings.Font.getFontSize());
         if (mIcon != -1)
             ((ImageView) view.findViewById(R.id.iv_Icon)).setImageResource(mIcon);
         if (mColor != -1) {
