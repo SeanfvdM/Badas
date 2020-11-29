@@ -17,7 +17,9 @@ import com.badas.badasoptions.Settings;
 import com.badas.badassolution.BuildConfig;
 import com.badas.badassolution.R;
 import com.badas.badasstyle.FontDownloader.Font;
+import com.badas.badasstyle.FontDownloader.FontBottomDialogFragment;
 import com.badas.badasstyle.FontDownloader.FontDialogFragment;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class PlaceholderFragment extends Fragment {
 
@@ -45,8 +47,15 @@ public class PlaceholderFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fontDialogFragment
-                        .show(getChildFragmentManager(), "Fonts");
+                FontDialogFragment.display(getChildFragmentManager());
+            }
+        });
+
+        Button button2 = root.findViewById(R.id.font_button2);
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fontBottomDialogFragment.show(getChildFragmentManager(), "Fonts");
             }
         });
 
