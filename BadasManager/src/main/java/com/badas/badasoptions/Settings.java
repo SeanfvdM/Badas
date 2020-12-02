@@ -116,23 +116,28 @@ public class Settings {
         public static void getStoredFont(Context context) {
             if (sharedPreferences == null)
                 throw new NullPointerException("Shared Preferences cannot be null");
-            FontRequest fontRequest = new FontRequestBuilder(context, R.array.com_google_android_gms_fonts_certs)
-                    .setQuery(sharedPreferences.getString("font", null)).build();
-            size = sharedPreferences.getInt("fontSize", 30);
-            FontsContract.requestFonts(context, fontRequest, new Handler(), null, new FontsContract.FontRequestCallback() {
-                @Override
-                public void onTypefaceRetrieved(Typeface typeface) {
-                    Font.typeface = typeface;
-                    loaded.put(Font.class.getSimpleName(), true);
-                    waitingEvents.moduleLoaded();
-                }
+            try {
+                FontRequest fontRequest = new FontRequestBuilder(context, R.array.com_google_android_gms_fonts_certs)
+                        .setQuery(sharedPreferences.getString("font", null)).build();
+                FontsContract.requestFonts(context, fontRequest, new Handler(), null, new FontsContract.FontRequestCallback() {
+                    @Override
+                    public void onTypefaceRetrieved(Typeface typeface) {
+                        Font.typeface = typeface;
+                        loaded.put(Font.class.getSimpleName(), true);
+                        waitingEvents.moduleLoaded();
+                    }
 
-                @Override
-                public void onTypefaceRequestFailed(int reason) {
-                    loaded.put(Font.class.getSimpleName(), true);
-                    waitingEvents.moduleLoaded();
-                }
-            });
+                    @Override
+                    public void onTypefaceRequestFailed(int reason) {
+                        loaded.put(Font.class.getSimpleName(), true);
+                        waitingEvents.moduleLoaded();
+                    }
+                });
+            } catch (Exception ignored) {
+
+            }
+            size = sharedPreferences.getInt("fontSize", 30);
+
         }
     }
 
