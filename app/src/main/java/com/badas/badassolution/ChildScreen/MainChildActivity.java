@@ -42,21 +42,27 @@ public class MainChildActivity extends AppCompatActivity {
         gameSelectorFragments.put(GameState.Game_ColorGame,
                 new GameSelectorFragmentTemplate()
                         .setTitle("Color Matching")
-                        .setDescription("[Placeholder]Match the large color tile to the correct smaller tile.")
+                        .setDescription("Match the large color tile to the correct smaller tile.")
                         .setIcon(R.drawable.ic_shapes_and_colors)
                         .setColor(getResources().getColor(R.color.blue, getTheme())));
         gameSelectorFragments.put(GameState.Game_ShapeGame,
                 new GameSelectorFragmentTemplate()
                         .setTitle("Shape Matching")
-                        .setDescription("[Placeholder]Match the large shape tile to the correct smaller tile.")
+                        .setDescription("Match the large shape tile to the correct smaller tile.")
                         .setIcon(R.drawable.ic_shapes_and_colors)
                         .setColor(getResources().getColor(R.color.blue, getTheme())));
         gameSelectorFragments.put(GameState.Game_CountGame,
                 new GameSelectorFragmentTemplate()
                         .setTitle("Counting")
-                        .setDescription("[Placeholder]Match the total words or image to the number\n(Note) First level does not load the images")
+                        .setDescription("Match the total image to the number.")
                         .setIcon(R.drawable.ic_count)
                         .setColor(getResources().getColor(R.color.green, getTheme())));
+        gameSelectorFragments.put(GameState.Game_WordGame,
+                new GameSelectorFragmentTemplate()
+                        .setTitle("Word")
+                        .setDescription("Match the word to the image.")
+                        .setIcon(R.drawable.ic_spelling)
+                        .setColor(getResources().getColor(R.color.pink, getTheme())));
 
         viewPager = findViewById(R.id.pager);
         GameSelectorPagerAdapter pagerAdapter = new GameSelectorPagerAdapter(this);
